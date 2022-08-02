@@ -1,11 +1,10 @@
 package br.com.springz.model;
 
-import lombok.AllArgsConstructor;
+import br.com.springz.dtoform.FuncionarioForm;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name="tb_funcionario")
@@ -35,4 +34,14 @@ public class Funcionario {
         this.idade = idade;
         this.ativo = ativo;
     }
+
+    public Funcionario (FuncionarioForm funcionarioForm) {
+       this.nome = funcionarioForm.getNome();
+       this.sobrenome = funcionarioForm.getSobrenome();
+       this.setEmail(funcionarioForm.getEmail());
+       this.setIdade(funcionarioForm.getIdade());
+       this.ativo = false;
+    }
+
+
 }

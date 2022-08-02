@@ -3,9 +3,6 @@ package br.com.springz.dtoform;
 import br.com.springz.model.Funcionario;
 import lombok.Getter;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Getter
 public class FuncionarioDto {
 
@@ -26,8 +23,6 @@ public class FuncionarioDto {
 
     }
 
-    public static List<FuncionarioDto> converter(List<Funcionario> funcionarios) {
-        return funcionarios.stream().map(FuncionarioDto::new).collect(Collectors.toList());
-    }
+
 
 }

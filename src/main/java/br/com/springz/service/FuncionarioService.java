@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -22,7 +22,7 @@ public class FuncionarioService {
     private final FuncionarioRepository funcionarioRepository;
 
     public List<FuncionarioDto> listar(){
-        return FuncionarioDto.converter(funcionarioRepository.findAll());
+        return converterListaFuncionarioDto(funcionarioRepository.findAll());
     }
 
     public ResponseEntity<FuncionarioDtoDetalhado> detalharFuncionario(Long id) {
@@ -37,16 +37,12 @@ public class FuncionarioService {
 //    }
 
     public Funcionario cadastrar(FuncionarioForm funcionarioForm){
-        Funcionario funcionario = funcionarioForm.converter(funcionarioForm);
-        System.out.println(funcionario);
-        funcionarioRepository.save(funcionario);
-        //URI uri = uriBuilder.path("/funcionarios/{id}").buildAndExpand(funcionario.getId()).toUri();
-        return funcionarioRepository.save(funcionario);
+        return funcionarioRepository.save(new Funcionario(funcionarioForm));
     }
 
     public ResponseEntity<FuncionarioDto> atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
         if(funcionarioExiste(id)){
-            return ResponseEntity.ok(new FuncionarioDto(funcionarioFormAtualizacao.atualizarFuncionario(id, funcionarioRepository)));
+            return ResponseEntity.ok(new FuncionarioDto(atualizarFuncionario(id, funcionarioFormAtualizacao)));
         }
         return ResponseEntity.notFound().build();
     }
@@ -60,8 +56,26 @@ public class FuncionarioService {
         return ResponseEntity.notFound().build();
     }
 
+    /*
+    Utilidades
+     */
     public boolean funcionarioExiste(Long id){
         return funcionarioRepository.findById(id).isPresent();
+    }
+
+    public List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) {
+        List<FuncionarioDto> teste = funcionarios.stream().map(FuncionarioDto::new).collect(Collectors.toList());
+        System.out.println("Lista está funcionando? "+teste);
+        return teste;
+    }
+
+    public Funcionario atualizarFuncionario(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {
+        Funcionario funcionario = funcionarioRepository.getReferenceById(id);
+        funcionario.setNome (funcionarioFormAtualizacao.getNome());
+        funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());
+//        funcionario.setEmail(funcionarioFormAtualizacao.getEmail());
+//        funcionario.setIdade(funcionarioFormAtualizacao.getIdade());
+        return funcionario;
     }
 
 }

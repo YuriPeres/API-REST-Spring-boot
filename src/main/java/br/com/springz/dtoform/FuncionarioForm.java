@@ -1,11 +1,12 @@
 package br.com.springz.dtoform;
 
-import br.com.springz.model.Funcionario;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Getter @Setter
 public class FuncionarioForm {
@@ -16,25 +17,19 @@ public class FuncionarioForm {
     private String sobrenome;
     @NotBlank @NotEmpty
     private String email;
-    @NotBlank @NotEmpty
-    private String idade;
+    @Min(value = 16, message = "Idade incorreta.")
+    @NotNull
+    private int idade;
 
 
     public FuncionarioForm() {
     }
 
-    public FuncionarioForm(Funcionario funcionario) {
-        this.nome = funcionario.getNome();
-        this.sobrenome = funcionario.getSobrenome();
-        this.email = funcionario.getEmail();
-        this.idade = funcionario.getIdade().toString();
-    }
+//    public FuncionarioForm(Funcionario funcionario) {
+//        this.nome = funcionario.getNome();
+//        this.sobrenome = funcionario.getSobrenome();
+//        this.email = funcionario.getEmail();
+//        this.idade = funcionario.getIdade();
+//    }
 
-    public static Funcionario converter(FuncionarioForm funcionarioForm) {
-        return new Funcionario(
-                funcionarioForm.nome, funcionarioForm.sobrenome,
-                funcionarioForm.getEmail(),
-                Integer.parseInt(funcionarioForm.getIdade()),
-                false);
-    }
 }

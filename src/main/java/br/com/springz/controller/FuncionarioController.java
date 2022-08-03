@@ -28,7 +28,7 @@ public class FuncionarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FuncionarioDtoDetalhado> DetalhesDoFuncionario(@PathVariable Long id){
+    public ResponseEntity<FuncionarioDtoDetalhado> detalhesDoFuncionario(@PathVariable Long id){
         return funcionarioService.detalharFuncionario(id);
     }
 

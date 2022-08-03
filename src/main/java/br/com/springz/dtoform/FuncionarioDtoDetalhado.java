@@ -2,11 +2,12 @@ package br.com.springz.dtoform;
 
 import br.com.springz.model.Funcionario;
 import lombok.Getter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Optional;
 
 @Getter
-public class FuncionarioDtoDetalhado {
+public class FuncionarioDtoDetalhado extends RepresentationModel<FuncionarioDtoDetalhado> {
 
     private long id;
     private String nome;

@@ -1,5 +1,6 @@
 package br.com.springz.service;
 
+import br.com.springz.controller.FuncionarioController;
 import br.com.springz.dtoform.FuncionarioDto;
 import br.com.springz.dtoform.FuncionarioDtoDetalhado;
 import br.com.springz.dtoform.FuncionarioForm;
@@ -11,8 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @AllArgsConstructor
 @Service
@@ -27,7 +32,9 @@ public class FuncionarioService {
 
     public ResponseEntity<FuncionarioDtoDetalhado> detalharFuncionario(Long id) {
         if(funcionarioExiste(id)) {
-            return ResponseEntity.ok(new FuncionarioDtoDetalhado(funcionarioRepository.findById(id)));
+            FuncionarioDtoDetalhado funcionarioDtoDetalhado = new FuncionarioDtoDetalhado(funcionarioRepository.findById(id));
+            funcionarioDtoDetalhado.add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).withRel("Lista de Funcionarios"));
+            return ResponseEntity.ok(funcionarioDtoDetalhado);
         }
         return ResponseEntity.notFound().build();
     }
@@ -64,9 +71,13 @@ public class FuncionarioService {
     }
 
     public List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) {
-        List<FuncionarioDto> teste = funcionarios.stream().map(FuncionarioDto::new).collect(Collectors.toList());
-        System.out.println("Lista está funcionando? "+teste);
-        return teste;
+        List<FuncionarioDto> listaFuncionarioDto = new ArrayList<>();
+        for(int i=0; i < funcionarios.size();i++){
+            listaFuncionarioDto.add(new FuncionarioDto(funcionarios.get(i)));
+            long id = listaFuncionarioDto.get(i).getId();
+            listaFuncionarioDto.get(i).add(linkTo(methodOn(FuncionarioController.class).detalhesDoFuncionario(id)).withSelfRel());
+        }
+        return listaFuncionarioDto;
     }
 
     public Funcionario atualizarFuncionario(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {

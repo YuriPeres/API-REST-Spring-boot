@@ -1,5 +1,6 @@
 package br.com.springz.dtoform;
 
+import br.com.springz.model.Endereco;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,14 +23,12 @@ public class FuncionarioForm {
     private int idade;
 
 
+    private EnderecoForm enderecoForm;
+
+
     public FuncionarioForm() {
     }
 
-//    public FuncionarioForm(Funcionario funcionario) {
-//        this.nome = funcionario.getNome();
-//        this.sobrenome = funcionario.getSobrenome();
-//        this.email = funcionario.getEmail();
-//        this.idade = funcionario.getIdade();
-//    }
+
 
 }

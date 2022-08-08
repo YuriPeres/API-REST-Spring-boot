@@ -1,11 +1,10 @@
 package br.com.springz.service;
 
 import br.com.springz.controller.FuncionarioController;
-import br.com.springz.dtoform.FuncionarioDto;
-import br.com.springz.dtoform.FuncionarioDtoDetalhado;
-import br.com.springz.dtoform.FuncionarioForm;
-import br.com.springz.dtoform.FuncionarioFormAtualizacao;
+import br.com.springz.dtoform.*;
+import br.com.springz.model.Endereco;
 import br.com.springz.model.Funcionario;
+import br.com.springz.repository.EnderecoRepository;
 import br.com.springz.repository.FuncionarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +24,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
+    private final EnderecoRepository enderecoRepository;
 
     public List<FuncionarioDto> listar(){
         return converterListaFuncionarioDto(funcionarioRepository.findAll());
@@ -45,6 +45,9 @@ public class FuncionarioService {
 
     public Funcionario cadastrar(FuncionarioForm funcionarioForm){
         return funcionarioRepository.save(new Funcionario(funcionarioForm));
+    }
+    public Endereco cadastrar(EnderecoForm enderecoForm){
+        return enderecoRepository.save(new Endereco(enderecoForm));
     }
 
     public ResponseEntity<FuncionarioDto> atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){

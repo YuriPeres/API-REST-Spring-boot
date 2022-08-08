@@ -11,8 +11,8 @@ import javax.persistence.*;
 @Getter @Setter
 public class Funcionario {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String nome;
@@ -23,16 +23,22 @@ public class Funcionario {
     private Integer idade;
     private Boolean ativo;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_endereco", referencedColumnName = "id")
+    private Endereco endereco;
+
+
     public Funcionario() {
 
     }
 
-    public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo) {
+    public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
         this.idade = idade;
         this.ativo = ativo;
+        this.endereco = endereco;
     }
 
     public Funcionario (FuncionarioForm funcionarioForm) {
@@ -41,7 +47,9 @@ public class Funcionario {
        this.setEmail(funcionarioForm.getEmail());
        this.setIdade(funcionarioForm.getIdade());
        this.ativo = false;
+       this.endereco = new Endereco(funcionarioForm.getEnderecoForm());
     }
+
 
 
 }

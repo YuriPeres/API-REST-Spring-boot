@@ -1,10 +1,8 @@
 package br.com.springz.controller;
 
-import br.com.springz.dtoform.FuncionarioDto;
-import br.com.springz.dtoform.FuncionarioDtoDetalhado;
-import br.com.springz.dtoform.FuncionarioForm;
-import br.com.springz.dtoform.FuncionarioFormAtualizacao;
+import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
+import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.service.FuncionarioService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +19,15 @@ import java.util.List;
 public class FuncionarioController {
 
     private final FuncionarioService funcionarioService;
+    private final FuncionarioRepository funcionarioRepository;
+
+
+
+    @GetMapping("/testando/{id}")
+    public Funcionario teste(@PathVariable Long id){
+        Funcionario funcionario = funcionarioRepository.findById(id).get();
+        return funcionario;
+    }
 
     @GetMapping
     public List<FuncionarioDto> listarFuncionarios(){
@@ -48,6 +55,12 @@ public class FuncionarioController {
     public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid FuncionarioForm funcionarioForm){
         return new ResponseEntity<>(funcionarioService.cadastrar(funcionarioForm), HttpStatus.CREATED);
     }
+
+//    @PostMapping("./endereco")
+//    @Transactional
+//    public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody @Valid EnderecoForm enderecoForm){
+//        return new ResponseEntity<>(funcionarioService.cadastrar(enderecoForm), HttpStatus.CREATED);
+//    }
 
     @PutMapping("/{id}")
     @Transactional

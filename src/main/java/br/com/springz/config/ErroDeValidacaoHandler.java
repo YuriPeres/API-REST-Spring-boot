@@ -1,38 +1,30 @@
 package br.com.springz.config;
 
+import br.com.springz.config.ExceptionsDtos.NaoEcontradoDto;
+import br.com.springz.config.exceptions.ExceptionNaoEcontrado;
 import lombok.AllArgsConstructor;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import javax.servlet.http.HttpServletRequest;
+import java.time.Instant;
 
 @AllArgsConstructor
 @RestControllerAdvice
 public class ErroDeValidacaoHandler {
 
-    private MessageSource messageSource;
+   // @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({ExceptionNaoEcontrado.class})
+    public ResponseEntity<NaoEcontradoDto> naoEcontrando(ExceptionNaoEcontrado ex, HttpServletRequest request) {
+        NaoEcontradoDto naoEcontradoDto = new NaoEcontradoDto();
+        naoEcontradoDto.setExcecao(ex.getMessage());
+        naoEcontradoDto.setDecricao(ex.getDescricaoMsgDeErro());
+        naoEcontradoDto.setStatus(HttpStatus.NOT_FOUND.value());
+        naoEcontradoDto.setInstante(Instant.now());
+        naoEcontradoDto.setOndeOcorreu(request.getRequestURI());
 
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({MethodArgumentNotValidException.class})
-    public List<ErroDeFormularioDto> handle(MethodArgumentNotValidException exception){
-            List<ErroDeFormularioDto> dto = new ArrayList<>();
-
-            List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
-
-            fieldErrors.forEach(e -> {
-                String mensagem = messageSource.getMessage(e, LocaleContextHolder.getLocale());
-                ErroDeFormularioDto erro = new ErroDeFormularioDto(e.getField(), mensagem);
-            dto.add(erro);
-            });
-
-            return dto;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(naoEcontradoDto);
     }
 }

@@ -15,8 +15,6 @@ public class Endereco {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne(mappedBy = "endereco")
-    private Funcionario funcionario;
 
     private String cep;
     private String logradouro;
@@ -29,15 +27,6 @@ public class Endereco {
     public Endereco() {
     }
 
-    public Endereco(Long id, Funcionario funcionario, String cep, String logradouro, String complemento, String bairro, String localidade, String uf) {
-        this.funcionario = funcionario;
-        this.cep = cep;
-        this.logradouro = logradouro;
-        this.complemento = complemento;
-        this.bairro = bairro;
-        this.localidade = localidade;
-        this.uf = uf;
-    }
 
     public Endereco(EnderecoForm enderecoForm) {
         this.cep = enderecoForm.getCep();
@@ -56,20 +45,6 @@ public class Endereco {
         this.bairro = bairro;
         this.localidade = localidade;
         this.uf = uf;
-    }
-
-    @Override
-    public String toString() {
-        return "Endereco{" +
-                "id=" + id +
-                ", funcionario=" + funcionario +
-                ", cep='" + cep + '\'' +
-                ", logradouro='" + logradouro + '\'' +
-                ", complemento='" + complemento + '\'' +
-                ", bairro='" + bairro + '\'' +
-                ", localidade='" + localidade + '\'' +
-                ", uf='" + uf + '\'' +
-                '}';
     }
 
 

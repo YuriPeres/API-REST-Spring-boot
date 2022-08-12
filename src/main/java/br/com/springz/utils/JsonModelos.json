@@ -1,0 +1,14 @@
+{
+  "nome": "alguem",
+  "sobrenome": "que existe",
+  "email": "alguem@email.com",
+  "idade": 55,
+  "endereco": {
+    "localidade": "cidade",
+    "logradouro": "rua bonita",
+    "cep": "96745000",
+    "complemento": "ap 2",
+    "       bairro": "Centro",
+    "uf": "RS"
+  }
+}

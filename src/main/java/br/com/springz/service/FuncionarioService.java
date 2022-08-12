@@ -1,10 +1,12 @@
 package br.com.springz.service;
 
+import br.com.springz.config.exceptions.ExceptionNaoEcontrado;
 import br.com.springz.controller.FuncionarioController;
-import br.com.springz.dtoform.*;
-import br.com.springz.model.Endereco;
+import br.com.springz.dtoform.FuncionarioDto;
+import br.com.springz.dtoform.FuncionarioDtoDetalhado;
+import br.com.springz.dtoform.FuncionarioForm;
+import br.com.springz.dtoform.FuncionarioFormAtualizacao;
 import br.com.springz.model.Funcionario;
-import br.com.springz.repository.EnderecoRepository;
 import br.com.springz.repository.FuncionarioRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -24,20 +25,33 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
-    private final EnderecoRepository enderecoRepository;
 
-    public List<FuncionarioDto> listar(){
+    public List<FuncionarioDto> listar() throws Exception {
         return converterListaFuncionarioDto(funcionarioRepository.findAll());
     }
 
-    public ResponseEntity<FuncionarioDtoDetalhado> detalharFuncionario(Long id) {
-        if(funcionarioExiste(id)) {
-            FuncionarioDtoDetalhado funcionarioDtoDetalhado = new FuncionarioDtoDetalhado(funcionarioRepository.findById(id));
-            funcionarioDtoDetalhado.add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).withRel("Lista de Funcionarios"));
-            return ResponseEntity.ok(funcionarioDtoDetalhado);
-        }
-        return ResponseEntity.notFound().build();
+    public FuncionarioDtoDetalhado detalharFuncionario(Long id) throws Exception {
+        Funcionario funcionario = funcionarioRepository.findById(id).orElseThrow(() ->
+                new ExceptionNaoEcontrado("Id não encontrado: " + id,
+                        "O Id informado não existe no banco de dados ")
+        );
+        return new FuncionarioDtoDetalhado(funcionario)
+                .add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).
+                        withRel("Lista de Funcionarios"));
     }
+
+//    public ResponseEntity<FuncionarioDtoDetalhado> detalharFuncionario(Long id) throws Exception {
+//        if(funcionarioExiste(id)) {
+//            Funcionario f = funcionarioRepository.findById(id).orElseThrow(() -> new Exception());
+//            FuncionarioDtoDetalhado funcionarioDtoDetalhado = new FuncionarioDtoDetalhado(f);
+//            funcionarioDtoDetalhado.add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).withRel("Lista de Funcionarios"));
+//            return ResponseEntity.ok(funcionarioDtoDetalhado);
+//        }
+//        return ResponseEntity.notFound().build();
+//    }
+
+
+
 //    public FuncionarioDtoDetalhado detalharFuncionarioPorNome(String nome) {
 //        Funcionario funcionario = funcionarioRepository.findByNome(nome);
 //        return new FuncionarioDtoDetalhado(funcionario);
@@ -45,9 +59,6 @@ public class FuncionarioService {
 
     public Funcionario cadastrar(FuncionarioForm funcionarioForm){
         return funcionarioRepository.save(new Funcionario(funcionarioForm));
-    }
-    public Endereco cadastrar(EnderecoForm enderecoForm){
-        return enderecoRepository.save(new Endereco(enderecoForm));
     }
 
     public ResponseEntity<FuncionarioDto> atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
@@ -73,7 +84,7 @@ public class FuncionarioService {
         return funcionarioRepository.findById(id).isPresent();
     }
 
-    public List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) {
+    public List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) throws Exception {
         List<FuncionarioDto> listaFuncionarioDto = new ArrayList<>();
         for(int i=0; i < funcionarios.size();i++){
             listaFuncionarioDto.add(new FuncionarioDto(funcionarios.get(i)));

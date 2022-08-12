@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/springz
     username: postgres
-    password: 4664
+    password: senha
   jpa:
     show-sql: false
     defer-datasource-initialization: true

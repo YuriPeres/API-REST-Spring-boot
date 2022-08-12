@@ -5,6 +5,7 @@ import br.com.springz.model.Funcionario;
 import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.service.FuncionarioService;
 import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,23 +20,16 @@ import java.util.List;
 public class FuncionarioController {
 
     private final FuncionarioService funcionarioService;
-    private final FuncionarioRepository funcionarioRepository;
 
-
-
-    @GetMapping("/testando/{id}")
-    public Funcionario teste(@PathVariable Long id){
-        Funcionario funcionario = funcionarioRepository.findById(id).get();
-        return funcionario;
-    }
 
     @GetMapping
-    public List<FuncionarioDto> listarFuncionarios(){
+    public List<FuncionarioDto> listarFuncionarios() throws Exception {
         return funcionarioService.listar();
     }
 
+    @ResponseBody
     @GetMapping("/{id}")
-    public ResponseEntity<FuncionarioDtoDetalhado> detalhesDoFuncionario(@PathVariable Long id){
+    public FuncionarioDtoDetalhado detalhesDoFuncionario(@PathVariable Long id) throws Exception {
         return funcionarioService.detalharFuncionario(id);
     }
 
@@ -51,7 +45,7 @@ public class FuncionarioController {
 //    }
 
     @PostMapping
-    @Transactional
+    @Transactional 
     public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid FuncionarioForm funcionarioForm){
         return new ResponseEntity<>(funcionarioService.cadastrar(funcionarioForm), HttpStatus.CREATED);
     }

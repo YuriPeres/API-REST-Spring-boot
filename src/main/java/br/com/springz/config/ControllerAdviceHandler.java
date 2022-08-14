@@ -13,7 +13,7 @@ import java.time.Instant;
 
 @AllArgsConstructor
 @RestControllerAdvice
-public class ErroDeValidacaoHandler {
+public class ControllerAdviceHandler {
 
    // @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler({ExceptionNaoEcontrado.class})

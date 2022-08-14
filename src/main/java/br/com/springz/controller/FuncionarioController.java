@@ -47,6 +47,9 @@ public class FuncionarioController {
     @PostMapping
     @Transactional 
     public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid FuncionarioForm funcionarioForm){
+        System.out.println(funcionarioForm);
+        System.out.println(funcionarioForm.getEnderecoForm());
+        System.out.println(funcionarioForm.getEnderecoForm().getBairro());
         return new ResponseEntity<>(funcionarioService.cadastrar(funcionarioForm), HttpStatus.CREATED);
     }
 

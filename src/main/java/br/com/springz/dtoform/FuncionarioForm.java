@@ -1,6 +1,6 @@
 package br.com.springz.dtoform;
 
-import br.com.springz.model.Endereco;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class FuncionarioForm {
     @NotNull
     private int idade;
 
-
+    @JsonProperty("endereco")
     private EnderecoForm enderecoForm;
 
 

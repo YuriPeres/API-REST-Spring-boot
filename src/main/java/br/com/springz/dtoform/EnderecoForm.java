@@ -1,7 +1,12 @@
 package br.com.springz.dtoform;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import java.util.Locale;
 
 
 @Getter @Setter
@@ -9,18 +14,17 @@ public class EnderecoForm {
 
 
 
-    //private Funcionario funcionario;
-//    @NotBlank @NotEmpty
+    @NotBlank @NotEmpty
     private String localidade;
-//    @NotBlank @NotEmpty
+    @NotBlank @NotEmpty
     private String logradouro;
-//    @NotBlank @NotEmpty
+    @NotBlank @NotEmpty
     private String cep;
-//    @NotBlank @NotEmpty
+    @NotBlank @NotEmpty
     private String complemento;
-//    @NotBlank @NotEmpty
+    @NotBlank @NotEmpty
     private String bairro;
-    //@NotBlank @NotEmpty @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "##")
+    @NotBlank @NotEmpty @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "##")
     private String uf;
 
 

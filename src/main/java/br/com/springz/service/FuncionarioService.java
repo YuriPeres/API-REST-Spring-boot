@@ -1,6 +1,6 @@
 package br.com.springz.service;
 
-import br.com.springz.config.exceptions.ExceptionNaoEcontrado;
+import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.controller.FuncionarioController;
 import br.com.springz.dtoform.FuncionarioDto;
 import br.com.springz.dtoform.FuncionarioDtoDetalhado;
@@ -32,7 +32,7 @@ public class FuncionarioService {
 
     public FuncionarioDtoDetalhado detalharFuncionario(Long id) throws Exception {
         Funcionario funcionario = funcionarioRepository.findById(id).orElseThrow(() ->
-                new ExceptionNaoEcontrado("Id não encontrado: " + id,
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                         "O Id informado não existe no banco de dados ")
         );
         return new FuncionarioDtoDetalhado(funcionario)

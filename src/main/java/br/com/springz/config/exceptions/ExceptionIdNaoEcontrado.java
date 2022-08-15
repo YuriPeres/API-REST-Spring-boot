@@ -4,17 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Setter @Getter
-public class ExceptionNaoEcontrado extends RuntimeException {
+public class ExceptionIdNaoEcontrado extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private String descricaoMsgDeErro;
 
-    public ExceptionNaoEcontrado(String mensagemDeErro) {
+    public ExceptionIdNaoEcontrado(String mensagemDeErro) {
         super(mensagemDeErro);
     }
 
-    public ExceptionNaoEcontrado(String mensagemDeErro, String descricaoMsgDeErro) {
+    public ExceptionIdNaoEcontrado(String mensagemDeErro, String descricaoMsgDeErro) {
         super(mensagemDeErro);
         this.descricaoMsgDeErro = descricaoMsgDeErro;
     }

@@ -34,7 +34,7 @@ public class Endereco {
         this.complemento = enderecoForm.getComplemento();
         this.bairro = enderecoForm.getBairro();
         this.localidade = enderecoForm.getLocalidade();
-        this.uf = enderecoForm.getUf();
+        this.uf = enderecoForm.getUf().toUpperCase();
 
     }
 

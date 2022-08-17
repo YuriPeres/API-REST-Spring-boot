@@ -62,7 +62,7 @@ public class FuncionarioService {
     }
 
     public ResponseEntity<FuncionarioDto> atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
-        if(funcionarioExiste(id)){
+        if(funcionarioRepository.findById(id).isPresent()){
             return ResponseEntity.ok(new FuncionarioDto(atualizarFuncionario(id, funcionarioFormAtualizacao)));
         }
         return ResponseEntity.notFound().build();
@@ -70,7 +70,7 @@ public class FuncionarioService {
 
 
     public ResponseEntity<?> delete(Long id) {
-        if (funcionarioExiste(id)){
+        if (funcionarioRepository.findById(id).isPresent()){
             funcionarioRepository.deleteById(id);
             return ResponseEntity.ok().build();
         }
@@ -80,11 +80,8 @@ public class FuncionarioService {
     /*
     Utilidades
      */
-    public boolean funcionarioExiste(Long id){
-        return funcionarioRepository.findById(id).isPresent();
-    }
 
-    public List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) throws Exception {
+    private List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) throws Exception {
         List<FuncionarioDto> listaFuncionarioDto = new ArrayList<>();
         for(int i=0; i < funcionarios.size();i++){
             listaFuncionarioDto.add(new FuncionarioDto(funcionarios.get(i)));
@@ -94,7 +91,7 @@ public class FuncionarioService {
         return listaFuncionarioDto;
     }
 
-    public Funcionario atualizarFuncionario(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {
+    private Funcionario atualizarFuncionario(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {
         Funcionario funcionario = funcionarioRepository.getReferenceById(id);
         funcionario.setNome (funcionarioFormAtualizacao.getNome());
         funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());

@@ -17,6 +17,7 @@ public class EnderecoDto {
 
     }
 
+
     public EnderecoDto(Endereco endereco) {
         this.cep = endereco.getCep();
         this.logradouro = endereco.getLogradouro();

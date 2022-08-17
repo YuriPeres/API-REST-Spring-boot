@@ -16,6 +16,12 @@ public class FuncionarioDto extends RepresentationModel<FuncionarioDto> {
 
     }
 
+    public FuncionarioDto(long id, String nome, String sobrenome) {
+        this.id = id;
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+    }
+
     public FuncionarioDto(Funcionario funcionario) {
         this.id = funcionario.getId();
         this.nome = funcionario.getNome();

@@ -13,6 +13,7 @@ import org.springframework.boot.jackson.JsonComponent;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import java.util.Optional;
 @Getter @Setter
 public class FuncionarioDtoDetalhado extends RepresentationModel<FuncionarioDtoDetalhado> {
 
-    private long id;
+    private Long id;
     private String nome;
     private String sobrenome;
     private String email;
@@ -64,7 +65,21 @@ public class FuncionarioDtoDetalhado extends RepresentationModel<FuncionarioDtoD
                 '}';
     }
 
-//    public static class FuncionarioDtoDetalhadoSerializer extends JsonSerializer<FuncionarioDtoDetalhado> {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        FuncionarioDtoDetalhado that = (FuncionarioDtoDetalhado) o;
+        return ativo == that.ativo && Objects.equals(id, that.id) && Objects.equals(nome, that.nome) && Objects.equals(sobrenome, that.sobrenome) && Objects.equals(email, that.email) && Objects.equals(idade, that.idade) && Objects.equals(endereco, that.endereco);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, nome, sobrenome, email, idade, endereco, ativo);
+    }
+
+    //    public static class FuncionarioDtoDetalhadoSerializer extends JsonSerializer<FuncionarioDtoDetalhado> {
 //
 //
 //        @Override

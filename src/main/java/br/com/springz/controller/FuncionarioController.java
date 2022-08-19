@@ -2,10 +2,8 @@ package br.com.springz.controller;
 
 import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
-import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.service.FuncionarioService;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,13 +22,13 @@ public class FuncionarioController {
 
     @GetMapping
     public List<FuncionarioDto> listarFuncionarios() throws Exception {
-        return funcionarioService.listar();
+        return funcionarioService.listarTodos();
     }
 
     @ResponseBody
     @GetMapping("/{id}")
     public FuncionarioDtoDetalhado detalhesDoFuncionario(@PathVariable Long id) throws Exception {
-        return funcionarioService.detalharFuncionario(id);
+        return funcionarioService.acharPorId(id);
     }
 
 //    @GetMapping("/{nome}")

@@ -1,34 +1,34 @@
 package br.com.springz.dtoform;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import java.util.Locale;
 
 
-@Getter @Setter
+@Data @AllArgsConstructor @NoArgsConstructor
 public class EnderecoForm {
 
 
 
-    @NotBlank @NotEmpty
+    @NotBlank(message = "Localidade informada de forma incorreta.") @Length(min = 3, max = 100)
     private String localidade;
-    @NotBlank @NotEmpty
+
+    @NotBlank(message = "Logradouro informado de forma incorreta.") @Length(min = 3, max = 100)
     private String logradouro;
-    @NotBlank @NotEmpty
+
+    @NotBlank(message = "CEP informado de forma incorreta.") @Length(min = 8, max = 8)
     private String cep;
-    @NotBlank @NotEmpty
+
     private String complemento;
-    @NotBlank @NotEmpty
+
+    @NotBlank(message = "Bairro informado de forma incorreta.") @Length(min = 3, max = 100)
     private String bairro;
-    @NotBlank @NotEmpty @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "##")
+
+    @NotBlank(message = "UF informado de forma incorreta.") @Length(min = 2, max = 2)
     private String uf;
 
-
-    public EnderecoForm() {
-    }
 
 }

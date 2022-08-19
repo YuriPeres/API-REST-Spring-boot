@@ -7,7 +7,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Getter
 public class FuncionarioDto extends RepresentationModel<FuncionarioDto> {
 
-    private long id;
+    private Long id;
     private String nome;
     private String sobrenome;
 //    private String email;

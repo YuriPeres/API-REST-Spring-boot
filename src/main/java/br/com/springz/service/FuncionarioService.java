@@ -26,11 +26,11 @@ public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
 
-    public List<FuncionarioDto> listar() throws Exception {
+    public List<FuncionarioDto> listarTodos() throws Exception {
         return converterListaFuncionarioDto(funcionarioRepository.findAll());
     }
 
-    public FuncionarioDtoDetalhado detalharFuncionario(Long id) throws Exception {
+    public FuncionarioDtoDetalhado acharPorId(Long id) throws Exception {
         Funcionario funcionario = funcionarioRepository.findById(id).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                         "O Id informado não existe no banco de dados ")

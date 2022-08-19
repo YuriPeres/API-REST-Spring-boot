@@ -1,34 +1,30 @@
 package br.com.springz.dtoform;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
-@Getter @Setter
+@Data @AllArgsConstructor @NoArgsConstructor
 public class FuncionarioForm {
 
-    @NotBlank @NotEmpty
+    @NotBlank(message = "Nome informado de forma incorreta.") @Length(min = 1, max = 100)
     private String nome;
-    @NotBlank @NotEmpty
+
+    @NotBlank(message = "Sobrenome informado de forma incorreta.") @Length(min = 1, max = 100)
     private String sobrenome;
-    @NotBlank @NotEmpty
+
+    @NotBlank(message = "Email informado de forma incorreta.") @Length(min = 1, max = 100)
     private String email;
-    @Min(value = 16, message = "Idade incorreta.")
-    @NotNull
-    private int idade;
+
+    @Min(value = 16, message = "Idade incorreta.") @Max(value = 100, message = "Já deu né? Aposenta.")
+    @NotNull(message = "Nome informado de forma incorreta.")
+    private Integer idade;
 
     @JsonProperty("endereco")
     private EnderecoForm enderecoForm;
-
-
-    public FuncionarioForm() {
-    }
-
-
 
 }

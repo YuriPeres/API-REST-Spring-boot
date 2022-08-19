@@ -14,9 +14,7 @@ public class FuncionarioStub {
     public static final String EMAIL_VALIDO;
     public static final Integer IDADE_VALIDA;
 
-    public static  final Boolean VERDADEIRO;
-
-    public static final Boolean FALSO;
+    public static  final Boolean ATIVO_VALIDO;
 
     public static final Funcionario FUNCIONARIO_VALIDO;
 
@@ -29,12 +27,11 @@ public class FuncionarioStub {
         SOBRENOME_VALIDO = "ex de sobrenome";
         EMAIL_VALIDO = "exde@email.com";
         IDADE_VALIDA = 30;
-        VERDADEIRO = true;
-        FALSO = false;
+        ATIVO_VALIDO = true;
 
         FUNCIONARIO_VALIDO = new Funcionario(
                 ID_VALIDO, NOME_VALIDO, SOBRENOME_VALIDO, EMAIL_VALIDO,
-                IDADE_VALIDA, VERDADEIRO, EnderecoStub.ENDERECO_VALIDO
+                IDADE_VALIDA, ATIVO_VALIDO, EnderecoStub.ENDERECO_VALIDO
         );
 
         FUNCIONARIO_DETALHADO_VALIDO = new FuncionarioDtoDetalhado(FUNCIONARIO_VALIDO);

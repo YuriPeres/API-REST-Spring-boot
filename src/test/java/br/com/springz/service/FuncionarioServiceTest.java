@@ -2,10 +2,7 @@ package br.com.springz.service;
 
 import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.controller.FuncionarioController;
-import br.com.springz.dtoform.EnderecoForm;
-import br.com.springz.dtoform.FuncionarioDto;
-import br.com.springz.dtoform.FuncionarioDtoDetalhado;
-import br.com.springz.dtoform.FuncionarioForm;
+import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
 import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.utils.EnderecoStub;
@@ -20,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,9 +25,9 @@ import java.util.Optional;
 import static br.com.springz.utils.FuncionarioStub.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
@@ -114,12 +112,6 @@ public class FuncionarioServiceTest {
 
         expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
         funcionarioService.acharPorId(ID_VALIDO);
-//        try{
-//            funcionarioService.acharPorId(ID_VALIDO);
-//        } catch (Exception ex){
-//            assertEquals(ExceptionIdNaoEcontrado.class, ex.getClass());
-//            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
-//        }
 
     }
 
@@ -146,10 +138,51 @@ public class FuncionarioServiceTest {
     }
 
     @Test
-    public void atualizar() {
+    @DisplayName("Quando atualizar retorna o form esperado")
+    public void atualizarComSucesso() {
+
+        given(funcionarioRepository.findById(anyLong())).willReturn(Optional.of((FUNCIONARIO_VALIDO)));
+        given(funcionarioRepository.getReferenceById(anyLong())).willReturn((FUNCIONARIO_VALIDO));
+
+        FuncionarioFormAtualizacao form = new FuncionarioFormAtualizacao(NOME_VALIDO, SOBRENOME_VALIDO);
+
+        FuncionarioDto resposta = funcionarioService.atualizar(anyLong(),form);
+
+        assertNotNull(resposta);
+        assertEquals(FuncionarioDto.class, resposta.getClass());
+        assertEquals(NOME_VALIDO, resposta.getNome());
+        assertEquals(SOBRENOME_VALIDO, resposta.getSobrenome());
+
     }
 
     @Test
-    public void delete() {
+    @DisplayName("Verifica se o funcionarioService.atualizar() lida corretamente com exception")
+    public void atualizarException() {
+        given(funcionarioRepository.findById(anyLong()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        funcionarioService.atualizar(anyLong(), new FuncionarioFormAtualizacao());
+
+    }
+
+    @Test
+    @DisplayName("Delete dando sucesso deve rodar uma vez.")
+    public void deleteComSucesso() {
+        given(funcionarioRepository.findById(anyLong())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
+        doNothing().when(funcionarioRepository).deleteById(anyLong());
+        funcionarioService.delete(ID_VALIDO);
+        verify(funcionarioRepository, times(1)).deleteById(anyLong());
+    }
+
+    @Test
+    @DisplayName("Delete quando não acha resposta")
+    public void deleteComException() {
+//        given(funcionarioRepository.findById(anyLong()))
+//                .willThrow(new Exception(OBJETO_NAO_ENCONTRADO));
+//
+//        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+//        funcionarioService.delete(anyLong());
+
     }
 }

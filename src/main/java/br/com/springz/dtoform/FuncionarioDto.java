@@ -29,6 +29,12 @@ public class FuncionarioDto extends RepresentationModel<FuncionarioDto> {
 //        this.email = funcionario.getEmail();
 
     }
+    public FuncionarioDto(FuncionarioFormAtualizacao form) {
+        this.nome = form.getNome();
+        this.sobrenome = form.getSobrenome();
+//        this.email = funcionario.getEmail();
+
+    }
 
 
 

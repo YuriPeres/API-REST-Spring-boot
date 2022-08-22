@@ -15,6 +15,7 @@ import java.util.List;
 public class DummyData {
     private final FuncionarioRepository funcionarioRepository;
 
+
     //@PostConstruct
     public void funcionarioCadastroFicticio() {
 

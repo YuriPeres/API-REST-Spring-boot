@@ -61,11 +61,17 @@ public class FuncionarioService {
         return funcionarioRepository.save(new Funcionario(funcionarioForm));
     }
 
-    public ResponseEntity<FuncionarioDto> atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
-        if(funcionarioRepository.findById(id).isPresent()){
-            return ResponseEntity.ok(new FuncionarioDto(atualizarFuncionario(id, funcionarioFormAtualizacao)));
-        }
-        return ResponseEntity.notFound().build();
+    public FuncionarioDto atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
+        Funcionario fun = funcionarioRepository.findById(id).orElseThrow(() ->
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+                        "O Id informado não existe no banco de dados "));
+
+            Funcionario funcionario = funcionarioRepository.getReferenceById(id);
+            funcionario.setNome (funcionarioFormAtualizacao.getNome());
+            funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());
+
+            return new FuncionarioDto(funcionario);
+
     }
 
 
@@ -91,13 +97,5 @@ public class FuncionarioService {
         return listaFuncionarioDto;
     }
 
-    private Funcionario atualizarFuncionario(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {
-        Funcionario funcionario = funcionarioRepository.getReferenceById(id);
-        funcionario.setNome (funcionarioFormAtualizacao.getNome());
-        funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());
-//        funcionario.setEmail(funcionarioFormAtualizacao.getEmail());
-//        funcionario.setIdade(funcionarioFormAtualizacao.getIdade());
-        return funcionario;
-    }
 
 }

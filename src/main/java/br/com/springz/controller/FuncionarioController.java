@@ -59,7 +59,7 @@ public class FuncionarioController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<FuncionarioDto> atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioFormAtualizacao funcionarioFormAtualizacao){
+    public FuncionarioDto atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioFormAtualizacao funcionarioFormAtualizacao){
         return funcionarioService.atualizar(id, funcionarioFormAtualizacao);
     }
 

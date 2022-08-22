@@ -1,27 +1,22 @@
 package br.com.springz.dtoform;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
-@Getter @Setter
+@Data @AllArgsConstructor @NoArgsConstructor
 public class FuncionarioFormAtualizacao {
 
     @NotBlank
-    @NotEmpty
     private String nome;
-    @NotBlank @NotEmpty
+    @NotBlank
     private String sobrenome;
 //    @NotBlank @NotEmpty
 //    private String email;
 //    @NotBlank @NotEmpty
 //    private String idade;
 
-
-    public FuncionarioFormAtualizacao() {
-    }
 
 //    public FuncionarioFormAtualizacao(Funcionario funcionario) {
 //        this.nome = funcionario.getNome();

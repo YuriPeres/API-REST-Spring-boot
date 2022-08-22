@@ -33,7 +33,7 @@ public class Funcionario {
     @Column(name = "ativo")
     private Boolean ativo;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id")
     private Endereco endereco;
 

@@ -1,10 +1,14 @@
 package br.com.springz.dtoform;
 
 import br.com.springz.model.Funcionario;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
-@Getter
+@Data
+@AllArgsConstructor @NoArgsConstructor
 public class FuncionarioDto extends RepresentationModel<FuncionarioDto> {
 
     private Long id;
@@ -12,9 +16,6 @@ public class FuncionarioDto extends RepresentationModel<FuncionarioDto> {
     private String sobrenome;
 //    private String email;
 
-    public FuncionarioDto() {
-
-    }
 
     public FuncionarioDto(long id, String nome, String sobrenome) {
         this.id = id;

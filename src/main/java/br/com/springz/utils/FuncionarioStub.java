@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class FuncionarioStub {
 
+    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
+    public static final int INDEX = 0;
+
     public static final Long ID_VALIDO;
     public static final String NOME_VALIDO;
     public static final String SOBRENOME_VALIDO;

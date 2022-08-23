@@ -26,18 +26,23 @@ public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
 
-    public List<FuncionarioDto> listarTodos() throws Exception {
+    public List<FuncionarioDto> listarTodos() {
         return converterListaFuncionarioDto(funcionarioRepository.findAll());
     }
 
-    public FuncionarioDtoDetalhado acharPorId(Long id) throws Exception {
+    public FuncionarioDtoDetalhado acharPorId(Long id)  {
         Funcionario funcionario = funcionarioRepository.findById(id).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                         "O Id informado não existe no banco de dados ")
         );
-        return new FuncionarioDtoDetalhado(funcionario)
-                .add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).
-                        withRel("Lista de Funcionarios"));
+        try {
+            return new FuncionarioDtoDetalhado(funcionario)
+                    .add(linkTo(methodOn(FuncionarioController.class).listarFuncionarios()).
+                            withRel("Lista de Funcionarios"));
+        } catch (Exception e) {
+            throw new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+                    "O Id informado não existe no banco de dados ");
+        }
     }
 
 //    public ResponseEntity<FuncionarioDtoDetalhado> detalharFuncionario(Long id) throws Exception {
@@ -51,48 +56,51 @@ public class FuncionarioService {
 //    }
 
 
-
 //    public FuncionarioDtoDetalhado detalharFuncionarioPorNome(String nome) {
 //        Funcionario funcionario = funcionarioRepository.findByNome(nome);
 //        return new FuncionarioDtoDetalhado(funcionario);
 //    }
 
-    public Funcionario cadastrar(FuncionarioForm funcionarioForm){
+    public Funcionario cadastrar(FuncionarioForm funcionarioForm) {
         return funcionarioRepository.save(new Funcionario(funcionarioForm));
     }
 
-    public FuncionarioDto atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao){
+    public FuncionarioDto atualizar(Long id, FuncionarioFormAtualizacao funcionarioFormAtualizacao) {
         Funcionario fun = funcionarioRepository.findById(id).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                         "O Id informado não existe no banco de dados "));
 
-            Funcionario funcionario = funcionarioRepository.getReferenceById(id);
-            funcionario.setNome (funcionarioFormAtualizacao.getNome());
-            funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());
+        Funcionario funcionario = funcionarioRepository.getReferenceById(id);
+        funcionario.setNome(funcionarioFormAtualizacao.getNome());
+        funcionario.setSobrenome(funcionarioFormAtualizacao.getSobrenome());
 
-            return new FuncionarioDto(funcionario);
+        return new FuncionarioDto(funcionario);
 
     }
 
 
     public ResponseEntity<?> delete(Long id) {
-        if (funcionarioRepository.findById(id).isPresent()){
-            funcionarioRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.notFound().build();
+        funcionarioRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+                "O Id informado não existe no banco de dados "));
+        funcionarioRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
     /*
     Utilidades
      */
 
-    private List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios) throws Exception {
+    private List<FuncionarioDto> converterListaFuncionarioDto(List<Funcionario> funcionarios)  {
         List<FuncionarioDto> listaFuncionarioDto = new ArrayList<>();
-        for(int i=0; i < funcionarios.size();i++){
+        for (int i = 0; i < funcionarios.size(); i++) {
             listaFuncionarioDto.add(new FuncionarioDto(funcionarios.get(i)));
             long id = listaFuncionarioDto.get(i).getId();
-            listaFuncionarioDto.get(i).add(linkTo(methodOn(FuncionarioController.class).detalhesDoFuncionario(id)).withSelfRel());
+            try {
+                listaFuncionarioDto.get(i).add(linkTo(methodOn(FuncionarioController.class).funcionarioPorId(id)).withSelfRel());
+            } catch (Exception e) {
+                throw new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+                        "O Id informado não existe no banco de dados ");
+            }
         }
         return listaFuncionarioDto;
     }

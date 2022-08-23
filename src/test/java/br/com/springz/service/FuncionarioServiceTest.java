@@ -37,8 +37,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class FuncionarioServiceTest {
 
 
-    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
-    public static final int INDEX = 0;
+
     @InjectMocks
     private FuncionarioService funcionarioService;
 
@@ -178,11 +177,11 @@ public class FuncionarioServiceTest {
     @Test
     @DisplayName("Delete quando não acha resposta")
     public void deleteComException() {
-//        given(funcionarioRepository.findById(anyLong()))
-//                .willThrow(new Exception(OBJETO_NAO_ENCONTRADO));
-//
-//        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
-//        funcionarioService.delete(anyLong());
+        given(funcionarioRepository.findById(anyLong()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        funcionarioService.delete(anyLong());
 
     }
 }

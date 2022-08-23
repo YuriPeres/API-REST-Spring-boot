@@ -21,52 +21,30 @@ public class FuncionarioController {
 
 
     @GetMapping
-    public List<FuncionarioDto> listarFuncionarios() throws Exception {
+    public List<FuncionarioDto> listarFuncionarios() {
         return funcionarioService.listarTodos();
     }
 
     @ResponseBody
     @GetMapping("/{id}")
-    public FuncionarioDtoDetalhado detalhesDoFuncionario(@PathVariable Long id) throws Exception {
+    public FuncionarioDtoDetalhado funcionarioPorId(@PathVariable Long id) {
         return funcionarioService.acharPorId(id);
     }
 
-//    @GetMapping("/{nome}")
-//    public FuncionarioDtoDetalhado DetalhesDoFuncionarioPorNome(@PathVariable String nome){
-//        return funcionarioService.detalharFuncionarioPorNome(nome);
-//    }
-
-//    @PostMapping
-//    @ResponseStatus(HttpStatus.CREATED)
-//    public Funcionario cadastrarFuncionario(@RequestBody FuncionarioForm funcionarioForm){
-//        return funcionarioService.cadastrar(funcionarioForm);
-//    }
-
     @PostMapping
-    @Transactional 
-    public ResponseEntity<Funcionario> cadastrarFuncionario(@RequestBody @Valid FuncionarioForm funcionarioForm){
-        System.out.println(funcionarioForm);
-        System.out.println(funcionarioForm.getEnderecoForm());
-        System.out.println(funcionarioForm.getEnderecoForm().getBairro());
-        return new ResponseEntity<>(funcionarioService.cadastrar(funcionarioForm), HttpStatus.CREATED);
+    @Transactional
+    @ResponseStatus(HttpStatus.CREATED)
+    public Funcionario cadastrarFuncionario(@RequestBody @Valid FuncionarioForm funcionarioForm){
+        return funcionarioService.cadastrar(funcionarioForm);
     }
-
-//    @PostMapping("./endereco")
-//    @Transactional
-//    public ResponseEntity<Endereco> cadastrarEndereco(@RequestBody @Valid EnderecoForm enderecoForm){
-//        return new ResponseEntity<>(funcionarioService.cadastrar(enderecoForm), HttpStatus.CREATED);
-//    }
-
     @PutMapping("/{id}")
     @Transactional
     public FuncionarioDto atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioFormAtualizacao funcionarioFormAtualizacao){
         return funcionarioService.atualizar(id, funcionarioFormAtualizacao);
     }
-
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> deletarFuncionario(@PathVariable Long id){
         return funcionarioService.delete(id);
     }
-
 }

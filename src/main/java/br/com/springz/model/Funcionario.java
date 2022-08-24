@@ -50,6 +50,16 @@ public class Funcionario {
         this.endereco = endereco;
     }
 
+    public Funcionario(Long id, String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {
+        this.id = id;
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.idade = idade;
+        this.ativo = ativo;
+        this.endereco = endereco;
+    }
+
     public Funcionario (FuncionarioForm funcionarioForm) {
        this.nome = funcionarioForm.getNome();
        this.sobrenome = funcionarioForm.getSobrenome();

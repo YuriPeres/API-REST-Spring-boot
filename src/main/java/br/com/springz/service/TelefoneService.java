@@ -21,12 +21,12 @@ public class TelefoneService {
     private final TelefoneRepository telefoneRepository;
     private final FuncionarioRepository funcionarioRepository;
 
-    public List<FuncionarioDto> listarTodosTelefones() {
+    public List<TelefoneDto> listarTodosTelefones() {
         List<TelefoneDto> telefoneDtoList = new ArrayList<>();
         for (Telefone telefone : telefoneRepository.findAll()){
             telefoneDtoList.add(new TelefoneDto(telefone));
         }
-        return listarTodosTelefones();
+        return telefoneDtoList;
     }
 
     public Telefone cadastrar(TelefoneDto telefoneDto){

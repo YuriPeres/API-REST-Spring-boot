@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity @Table(name="tb_telefone")
@@ -22,10 +23,15 @@ public class Telefone {
     @JoinTable(name = "tb_funcionario_telefone",
         joinColumns = @JoinColumn(name = "id_telefone", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "id_funcionario", referencedColumnName = "id"))
-    private Set<Funcionario> funcionarios;
+    private List<Funcionario> funcionarios;
 
     public Telefone(TelefoneDto dto) {
         this.numero = dto.getNumero();
         this.funcionarios = dto.getFuncionarios();
+    }
+
+    public Telefone(Long id, Long numero) {
+        this.id = id;
+        this.numero = numero;
     }
 }

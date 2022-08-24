@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity @Table(name="tb_funcionario")
 @Data @AllArgsConstructor @NoArgsConstructor
@@ -36,6 +37,9 @@ public class Funcionario {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id")
     private Endereco endereco;
+
+    @ManyToMany(mappedBy = "funcionarios")
+    private Set<Telefone> telefones;
 
     public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {
         this.nome = nome;

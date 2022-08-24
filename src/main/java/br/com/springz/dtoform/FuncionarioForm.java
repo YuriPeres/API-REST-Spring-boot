@@ -21,7 +21,7 @@ public class FuncionarioForm {
     private String email;
 
     @Min(value = 16, message = "Idade incorreta.") @Max(value = 100, message = "Já deu né? Aposenta.")
-    @NotNull(message = "Nome informado de forma incorreta.")
+    @NotNull(message = "Idade informada de forma incorreta.")
     private Integer idade;
 
     @JsonProperty("endereco")

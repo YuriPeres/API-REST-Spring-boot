@@ -17,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +24,8 @@ import java.util.Optional;
 import static br.com.springz.utils.FuncionarioStub.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -34,7 +34,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 //@ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)//liga o spring com junit
 @SpringBootTest
-public class FuncionarioServiceTest {
+public class TelefoneServiceTest {
 
 
 
@@ -81,7 +81,6 @@ public class FuncionarioServiceTest {
                 ID_VALIDO, NOME_VALIDO, SOBRENOME_VALIDO, EMAIL_VALIDO,
                 IDADE_VALIDA, ATIVO_VALIDO, EnderecoStub.ENDERECO_VALIDO
         );
-
         given(funcionarioRepository.findById(anyLong())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
 
         FuncionarioDtoDetalhado resposta = funcionarioService.acharPorId(ID_VALIDO);

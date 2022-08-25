@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity @Table(name="tb_funcionario")
@@ -39,7 +40,7 @@ public class Funcionario {
     private Endereco endereco;
 
     @ManyToMany(mappedBy = "funcionarios")
-    private Set<Telefone> telefones;
+    private List<Telefone> telefones;
 
     public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {
         this.nome = nome;

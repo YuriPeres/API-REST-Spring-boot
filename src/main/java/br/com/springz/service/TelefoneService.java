@@ -1,5 +1,6 @@
 package br.com.springz.service;
 
+import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.FuncionarioDto;
 import br.com.springz.dtoform.TelefoneDto;
 import br.com.springz.model.Funcionario;
@@ -10,6 +11,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,27 +25,29 @@ public class TelefoneService {
 
     public List<TelefoneDto> listarTodosTelefones() {
         List<TelefoneDto> telefoneDtoList = new ArrayList<>();
-        for (Telefone telefone : telefoneRepository.findAll()){
+        for (Telefone telefone : telefoneRepository.findAll()) {
             telefoneDtoList.add(new TelefoneDto(telefone));
         }
         return telefoneDtoList;
     }
 
-    public Telefone cadastrar(TelefoneDto telefoneDto){
-        return telefoneRepository.save(new Telefone(telefoneDto));
-    }
+    public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, TelefoneDto telefoneDto) {
+        Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
+                        "O Id informado não existe no banco de dados "));
 
-    public String associarTelefoneAoFuncionario(Long idFuncionario, Long idTelefone){
-        try{
-            Telefone telefone = telefoneRepository.findById(idTelefone).orElseThrow();
-            Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow();
-            funcionario.getTelefones().add(telefone);
-        } catch (Exception ex){
-            System.out.println("deu ruim -> "+ex.getMessage());
-        }
+        Telefone telefone = new Telefone(telefoneDto);
+        telefone.getFuncionarios().add(funcionario);
+        System.out.println(funcionario);
+        System.out.println(telefone);
+        List<Telefone> listaTelefone = funcionario.getTelefones();
+        listaTelefone.add(telefone);
+
+        funcionario.setTelefones(listaTelefone);
         System.out.println(funcionarioRepository.getReferenceById(idFuncionario));
         System.out.println(funcionarioRepository.getReferenceById(idFuncionario).getTelefones());
-        return "feito";
+        return funcionario;
+
     }
 
 

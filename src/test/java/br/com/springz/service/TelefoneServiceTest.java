@@ -85,17 +85,21 @@ public class TelefoneServiceTest {
 
     @Test
     @DisplayName("Quando cadastrar retorna sucesso.")
-    public void cadastrarValido() {
-        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+    public void cadastrarTelefoneEmFuncionarioValido() {
+//        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+        given(funcionarioRepository.findById(any())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
 
-        TelefoneDto dto = new TelefoneDto(ID_VALIDO, NUMERO_VALIDO);
-        Telefone resposta = telefoneService.cadastrar(new TelefoneDto(ID_VALIDO, NUMERO_VALIDO));
+
+        TelefoneDto dto = new TelefoneDto(null, NUMERO_VALIDO);
+        Funcionario resposta = telefoneService.cadastrarTelefoneEmFuncionario(ID_VALIDO, dto);
 
         assertNotNull(resposta);
-        assertEquals(Telefone.class, resposta.getClass());
-        assertEquals(ID_VALIDO, resposta.getId());
-        assertEquals(NUMERO_VALIDO, resposta.getNumero());
-        assertEquals(null, resposta.getFuncionarios());
+        assertEquals(Funcionario.class, resposta.getClass());
+        assertEquals(ID_VALIDO, resposta.getTelefones().get(0).getId());
+        assertEquals(NUMERO_VALIDO, resposta.getTelefones().get(0).getNumero());
+        Funcionario fun = FUNCIONARIO_VALIDO;
+        fun.getTelefones().add(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+        assertEquals(fun, resposta);
     }
 //
 //    @Test

@@ -4,6 +4,7 @@ import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
 import br.com.springz.service.FuncionarioService;
+import br.com.springz.service.TelefoneService;
 import br.com.springz.utils.EnderecoStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,12 +41,15 @@ class FuncionarioControllerTest {
     @Mock
     private FuncionarioService service;
 
+    @Mock
+    private TelefoneService telService;
+
 
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        controller = new FuncionarioController(service);
+        controller = new FuncionarioController(service, telService);
     }
 
     @Test

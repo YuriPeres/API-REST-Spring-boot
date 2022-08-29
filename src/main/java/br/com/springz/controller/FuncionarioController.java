@@ -3,6 +3,7 @@ package br.com.springz.controller;
 import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
 import br.com.springz.service.FuncionarioService;
+import br.com.springz.service.TelefoneService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 public class FuncionarioController {
 
     private final FuncionarioService funcionarioService;
+    private final TelefoneService telefoneService;
 
 
     @GetMapping
@@ -39,12 +41,30 @@ public class FuncionarioController {
     }
     @PutMapping("/{id}")
     @Transactional
-    public FuncionarioDto atualizarFuncionario(@PathVariable Long id, @RequestBody @Valid FuncionarioFormAtualizacao funcionarioFormAtualizacao){
-        return funcionarioService.atualizar(id, funcionarioFormAtualizacao);
+    public FuncionarioDto atualizarFuncionario(@PathVariable Long id,
+                                               @RequestBody @Valid FuncionarioFormAtualizacao formAtualizacao){
+        return funcionarioService.atualizar(id, formAtualizacao);
     }
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<?> deletarFuncionario(@PathVariable Long id){
         return funcionarioService.delete(id);
     }
+
+
+    /*
+    Telefone
+     */
+
+    @GetMapping("/telefone")
+    public List<TelefoneDto> listarTelefones() {
+        return telefoneService.listarTodosTelefones();
+    }
+
+    @PutMapping("/telefone/{id}")
+    @Transactional
+    public Funcionario cadastrarTelefone (@PathVariable Long id, @RequestBody @Valid TelefoneDto telefone){
+        return telefoneService.cadastrarTelefoneEmFuncionario(id, telefone);
+    }
+
 }

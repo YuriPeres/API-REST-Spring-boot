@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -40,7 +41,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class TelefoneServiceTest {
 
 
-    public static final Long NUMERO_VALIDO = 988776644L;
+    public static final BigInteger NUMERO_VALIDO = BigInteger.valueOf(988776644);
     private static final List<Funcionario> LISTA_FUNCIONARIO = List.of(FUNCIONARIO_VALIDO);
     @InjectMocks
     private FuncionarioService funcionarioService;
@@ -86,8 +87,9 @@ public class TelefoneServiceTest {
     @Test
     @DisplayName("Quando cadastrar retorna sucesso.")
     public void cadastrarTelefoneEmFuncionarioValido() {
-//        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, NUMERO_VALIDO));
         given(funcionarioRepository.findById(any())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
+        given(funcionarioRepository.save(any())).willReturn(FUNCIONARIO_VALIDO);
 
 
         TelefoneDto dto = new TelefoneDto(null, NUMERO_VALIDO);

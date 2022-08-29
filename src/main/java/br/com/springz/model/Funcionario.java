@@ -1,9 +1,11 @@
 package br.com.springz.model;
 
 import br.com.springz.dtoform.FuncionarioForm;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
@@ -49,6 +51,17 @@ public class Funcionario {
         this.idade = idade;
         this.ativo = ativo;
         this.endereco = endereco;
+    }
+
+    public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco,
+                       List telefones) {
+        this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.email = email;
+        this.idade = idade;
+        this.ativo = ativo;
+        this.endereco = endereco;
+        setTelefones(telefones);
     }
 
     public Funcionario(Long id, String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {

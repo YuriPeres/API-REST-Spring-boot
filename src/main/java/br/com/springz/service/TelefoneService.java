@@ -8,6 +8,8 @@ import br.com.springz.model.Telefone;
 import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.repository.TelefoneRepository;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -37,17 +39,28 @@ public class TelefoneService {
                         "O Id informado não existe no banco de dados "));
 
         Telefone telefone = new Telefone(telefoneDto);
-        telefone.getFuncionarios().add(funcionario);
-        System.out.println(funcionario);
-        System.out.println(telefone);
-        List<Telefone> listaTelefone = funcionario.getTelefones();
-        listaTelefone.add(telefone);
+        if(telefone.getFuncionarios() == null) {
+            telefone.setFuncionarios(new ArrayList<>());
+        }
 
-        funcionario.setTelefones(listaTelefone);
-        System.out.println(funcionarioRepository.getReferenceById(idFuncionario));
-        System.out.println(funcionarioRepository.getReferenceById(idFuncionario).getTelefones());
+        telefone.getFuncionarios().add(funcionario);
+
+        if(funcionario.getTelefones() == null) {
+            funcionario.setTelefones(new ArrayList<>());
+        }
+
+        funcionario.getTelefones().add(telefoneRepository.save(telefone));
+        funcionarioRepository.save(funcionario);
+
         return funcionario;
 
+    }
+
+    public ResponseEntity<?> deletarTelefone(Long id) {
+        telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+                "O Id informado não existe no banco de dados "));
+        telefoneRepository.deleteById(id);
+        return ResponseEntity.ok().build();
     }
 
 

@@ -1,11 +1,14 @@
 package br.com.springz.model;
 
 import br.com.springz.dtoform.TelefoneDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
@@ -17,8 +20,9 @@ public class Telefone {
     private Long id;
 
     @Column(name="numero")
-    private Long numero;
+    private BigInteger numero;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "tb_funcionario_telefone",
         joinColumns = @JoinColumn(name = "id_telefone", referencedColumnName = "id"),
@@ -30,8 +34,16 @@ public class Telefone {
         this.funcionarios = dto.getFuncionarios();
     }
 
-    public Telefone(Long id, Long numero) {
+    public Telefone(Long id, BigInteger numero) {
         this.id = id;
         this.numero = numero;
+    }
+
+    @Override
+    public String toString() {
+        return "Telefone{" +
+                "id=" + id +
+                ", numero=" + numero +
+                '}';
     }
 }

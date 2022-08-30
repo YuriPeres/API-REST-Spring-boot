@@ -49,7 +49,13 @@ public class TelefoneService {
             funcionario.setTelefones(new ArrayList<>());
         }
 
-        funcionario.getTelefones().add(telefoneRepository.save(telefone));
+        Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumero());
+        if(telefone.getNumero().equals(telefoneExiste.getNumero())){
+            funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
+        }
+        else {
+            funcionario.getTelefones().add(telefoneRepository.save(telefone));
+        }
         funcionarioRepository.save(funcionario);
 
         return funcionario;
@@ -60,6 +66,12 @@ public class TelefoneService {
         telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                 "O Id informado não existe no banco de dados "));
         telefoneRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<?> deletarTelefoneApenasDoFuncionario(long idFuncionario, long idTelefone) {
+        telefoneRepository.deletarVinculoTelefoneDoFuncionario(idFuncionario, idTelefone);
+        telefoneRepository.deletarTelefoneApenasDoFuncionario(idFuncionario, idTelefone);
         return ResponseEntity.ok().build();
     }
 

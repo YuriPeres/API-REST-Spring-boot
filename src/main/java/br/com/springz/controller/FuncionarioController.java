@@ -67,4 +67,10 @@ public class FuncionarioController {
         return telefoneService.cadastrarTelefoneEmFuncionario(id, telefone);
     }
 
+    @DeleteMapping("/telefone/{idTelefone}")
+    @Transactional
+    public ResponseEntity<?> deletarTelefoneDoFuncionario(@PathVariable Long idTelefone){
+        return telefoneService.deletarTelefoneApenasDoFuncionario(12L, idTelefone);
+    }
+
 }

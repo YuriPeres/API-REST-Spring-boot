@@ -28,7 +28,7 @@ public class TelefoneDto {
 //    @NotNull
 //    private Long idFuncionario;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     private List<Funcionario> funcionarios;
 
     public TelefoneDto(Telefone telefone) {

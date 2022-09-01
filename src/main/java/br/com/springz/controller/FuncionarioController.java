@@ -61,16 +61,28 @@ public class FuncionarioController {
         return telefoneService.listarTodosTelefones();
     }
 
-    @PutMapping("/telefone/{id}")
+    @PutMapping("/telefone/{idFuncionario}")
     @Transactional
-    public Funcionario cadastrarTelefone (@PathVariable Long id, @RequestBody @Valid TelefoneDto telefone){
-        return telefoneService.cadastrarTelefoneEmFuncionario(id, telefone);
+    public FuncionarioDtoDetalhado cadastrarTelefone (@PathVariable Long idFuncionario, @RequestBody @Valid TelefoneDto telefone){
+        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario(idFuncionario, telefone));
     }
 
-    @DeleteMapping("/telefone/{idTelefone}")
+    @PutMapping("/telefone/atualizar")
+    public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneFormIds ids){
+        System.out.println(telefoneService.atualizarTelefone(ids.getIdFuncionario(), ids.getIdTelefone()));
+        return null;
+    }
+
+    @DeleteMapping("/telefone/")
     @Transactional
-    public ResponseEntity<?> deletarTelefoneDoFuncionario(@PathVariable Long idTelefone){
-        return telefoneService.deletarTelefoneApenasDoFuncionario(12L, idTelefone);
+    public ResponseEntity<?> deletarTelefoneDoFuncionario(@RequestBody @Valid TelefoneFormIds ids){
+        System.out.println(ids);
+        return telefoneService.deletarTelefoneApenasDoFuncionario(ids.getIdFuncionario(), ids.getIdTelefone());
+    }
+
+    @DeleteMapping("telefone/{id}")
+    public ResponseEntity<?> deletarTelefone(@PathVariable Long id){
+        return telefoneService.deletarTelefone(id);
     }
 
 }

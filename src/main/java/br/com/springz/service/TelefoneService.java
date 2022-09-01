@@ -2,6 +2,7 @@ package br.com.springz.service;
 
 import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.FuncionarioDto;
+import br.com.springz.dtoform.FuncionarioDtoDetalhado;
 import br.com.springz.dtoform.TelefoneDto;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
@@ -11,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.NotBlank;
@@ -49,12 +51,14 @@ public class TelefoneService {
             funcionario.setTelefones(new ArrayList<>());
         }
 
-        Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumero());
-        if(telefone.getNumero().equals(telefoneExiste.getNumero())){
+        try{
+            Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumero());
+
             funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
-        }
-        else {
+
+        } catch (Exception ex) {
             funcionario.getTelefones().add(telefoneRepository.save(telefone));
+
         }
         funcionarioRepository.save(funcionario);
 
@@ -62,6 +66,16 @@ public class TelefoneService {
 
     }
 
+    @Transactional
+    public Funcionario atualizarTelefone(Long idFuncionario, Long idTelefone){
+        Boolean existeLigacao = telefoneRepository.telefoneExisteEmFuncionario(idFuncionario, idTelefone);
+        System.out.println(existeLigacao);
+
+        return null;
+    }
+
+
+    @Transactional
     public ResponseEntity<?> deletarTelefone(Long id) {
         telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                 "O Id informado não existe no banco de dados "));
@@ -69,8 +83,7 @@ public class TelefoneService {
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<?> deletarTelefoneApenasDoFuncionario(long idFuncionario, long idTelefone) {
-        telefoneRepository.deletarVinculoTelefoneDoFuncionario(idFuncionario, idTelefone);
+    public ResponseEntity<?> deletarTelefoneApenasDoFuncionario(Long idFuncionario, Long idTelefone) {
         telefoneRepository.deletarTelefoneApenasDoFuncionario(idFuncionario, idTelefone);
         return ResponseEntity.ok().build();
     }

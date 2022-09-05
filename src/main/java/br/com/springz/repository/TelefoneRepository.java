@@ -29,6 +29,7 @@ public interface TelefoneRepository extends JpaRepository<Telefone, Long> {
     boolean telefoneExisteEmFuncionario(@Param("idFuncionario") Long IdFuncionario,
                                         @Param("idTelefone") Long idTelefone);
 
+
     Telefone findByNumero(BigInteger numero);
 
 }

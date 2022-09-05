@@ -8,6 +8,8 @@ import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
 import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.repository.TelefoneRepository;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.constraints.NotBlank;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,7 @@ public class TelefoneService {
         return telefoneDtoList;
     }
 
+    @Transactional
     public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, TelefoneDto telefoneDto) {
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
@@ -65,6 +69,54 @@ public class TelefoneService {
         return funcionario;
 
     }
+
+    @Transactional
+    public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, String stringTelefones) {
+        Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
+                        "O Id informado não existe no banco de dados "));
+
+
+        Gson gson = new Gson();
+
+        Type tipoLista = new TypeToken<ArrayList<Telefone>>() {}.getType();
+
+        ArrayList<Telefone> listaTelefones  = gson.fromJson(stringTelefones, tipoLista);
+
+        for (Telefone telefoneDaLista:
+             listaTelefones) {
+
+            Telefone telefone = telefoneDaLista;
+            if(telefone.getFuncionarios() == null) {
+                telefone.setFuncionarios(new ArrayList<>());
+            }
+
+            telefone.getFuncionarios().add(funcionario);
+
+            if(funcionario.getTelefones() == null) {
+                funcionario.setTelefones(new ArrayList<>());
+            }
+
+            try{
+                Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDaLista.getNumero());
+
+                funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
+
+            } catch (Exception ex) {
+                funcionario.getTelefones().add(telefoneRepository.save(telefone));
+
+            }
+            funcionarioRepository.save(funcionario);
+
+        }
+
+
+
+        return funcionario;
+
+    }
+
+
 
     @Transactional
     public Funcionario atualizarTelefone(Long idFuncionario, Long idTelefone){

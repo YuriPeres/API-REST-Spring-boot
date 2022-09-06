@@ -5,12 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 @Entity @Table(name="tb_telefone")
 @Data @AllArgsConstructor @NoArgsConstructor
@@ -29,14 +27,14 @@ public class Telefone {
         inverseJoinColumns = @JoinColumn(name = "id_funcionario", referencedColumnName = "id"))
     private List<Funcionario> funcionarios;
 
-    public Telefone(TelefoneDto dto) {
-        this.numero = dto.getNumero();
+    public Telefone(TelefoneDto dto, int i) {
+        this.numero = dto.getNumeros().get(i);
         this.funcionarios = dto.getFuncionarios();
     }
 
-    public Telefone(Long id, BigInteger numero) {
+    public Telefone(Long id, List<BigInteger> numero, int i) {
         this.id = id;
-        this.numero = numero;
+        this.numero = numero.get(i);
     }
 
     @Override

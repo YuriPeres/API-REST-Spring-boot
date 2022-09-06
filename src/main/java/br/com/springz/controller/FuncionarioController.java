@@ -61,16 +61,17 @@ public class FuncionarioController {
         return telefoneService.listarTodosTelefones();
     }
 
-//    @PutMapping("/telefone/{idFuncionario}")
-//    @Transactional
-//    public FuncionarioDtoDetalhado cadastrarTelefone (@PathVariable Long idFuncionario, @RequestBody @Valid TelefoneDto telefone){
-//        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario(idFuncionario, telefone));
-//    }
-
-    @PutMapping("/telefone/{idFuncionario}")
-    public FuncionarioDtoDetalhado cadastrarTelefone (@PathVariable Long idFuncionario, @RequestBody @Valid String telefones){
-        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario(idFuncionario, telefones));
+    @PutMapping("/telefone/cadastrar")
+    @Transactional
+    public FuncionarioDtoDetalhado cadastrarTelefone (@RequestBody @Valid TelefoneDto telefone){
+        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario
+                (telefone.getIdFuncionario(), telefone));
     }
+
+//    @PutMapping("/telefone/{idFuncionario}")
+//    public FuncionarioDtoDetalhado cadastrarTelefone (@PathVariable Long idFuncionario, @RequestBody @Valid String telefones){
+//        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario(idFuncionario, telefones));
+//    }
 
     @PutMapping("/telefone/atualizar")
     public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneFormIds ids){

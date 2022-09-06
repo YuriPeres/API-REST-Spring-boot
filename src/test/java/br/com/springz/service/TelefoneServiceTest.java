@@ -1,13 +1,10 @@
 package br.com.springz.service;
 
-import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
-import br.com.springz.controller.FuncionarioController;
 import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
 import br.com.springz.repository.FuncionarioRepository;
 import br.com.springz.repository.TelefoneRepository;
-import br.com.springz.utils.EnderecoStub;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,17 +20,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static br.com.springz.utils.FuncionarioStub.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 //@ExtendWith(MockitoExtension.class)
 @RunWith(MockitoJUnitRunner.class)//liga o spring com junit
@@ -72,7 +65,7 @@ public class TelefoneServiceTest {
     @Test
     @DisplayName("Verifica se o telefoneService.listarTodosTelefones() retorna uma Set<TelefoneDto> corretamente")
     public void listarTodosTelefonesValido() {
-        given(telefoneRepository.findAll()).willReturn(List.of(new Telefone(ID_VALIDO, NUMERO_VALIDO)));
+        given(telefoneRepository.findAll()).willReturn(List.of(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0)));
 
         List<TelefoneDto> resposta = telefoneService.listarTodosTelefones();
 
@@ -81,18 +74,18 @@ public class TelefoneServiceTest {
         assertEquals(1, resposta.size());
         assertEquals(TelefoneDto.class, resposta.get(INDEX).getClass());
         assertEquals(ID_VALIDO, resposta.get(INDEX).getId());
-        assertEquals(NUMERO_VALIDO, resposta.get(INDEX).getNumero());
+        assertEquals(NUMERO_VALIDO, resposta.get(INDEX).getNumeros());
 }
 
     @Test
     @DisplayName("Quando cadastrar retorna sucesso.")
     public void cadastrarTelefoneEmFuncionarioValido() {
-        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0));
         given(funcionarioRepository.findById(any())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
         given(funcionarioRepository.save(any())).willReturn(FUNCIONARIO_VALIDO);
 
 
-        TelefoneDto dto = new TelefoneDto(null, NUMERO_VALIDO);
+        TelefoneDto dto = new TelefoneDto(null, List.of(NUMERO_VALIDO));
         Funcionario resposta = telefoneService.cadastrarTelefoneEmFuncionario(ID_VALIDO, dto);
 
         assertNotNull(resposta);
@@ -100,7 +93,7 @@ public class TelefoneServiceTest {
         assertEquals(ID_VALIDO, resposta.getTelefones().get(0).getId());
         assertEquals(NUMERO_VALIDO, resposta.getTelefones().get(0).getNumero());
         Funcionario fun = FUNCIONARIO_VALIDO;
-        fun.getTelefones().add(new Telefone(ID_VALIDO, NUMERO_VALIDO));
+        fun.getTelefones().add(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0));
         assertEquals(fun, resposta);
     }
 //

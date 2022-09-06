@@ -25,7 +25,7 @@ public interface TelefoneRepository extends JpaRepository<Telefone, Long> {
 //                           where tft.id_funcionario =18 and tft.id_telefone
 //                           = 35)::bool
     @Query(value = "SELECT EXISTS (SELECT * FROM tb_funcionario_telefone " +
-            "WHERE id_funcionario =:idFuncionario AND id_telefone:idTelefone)", nativeQuery = true)
+            "WHERE id_funcionario =:idFuncionario AND id_telefone=:idTelefone)", nativeQuery = true)
     boolean telefoneExisteEmFuncionario(@Param("idFuncionario") Long IdFuncionario,
                                         @Param("idTelefone") Long idTelefone);
 

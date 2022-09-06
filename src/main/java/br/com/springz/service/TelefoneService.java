@@ -1,8 +1,6 @@
 package br.com.springz.service;
 
 import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
-import br.com.springz.dtoform.FuncionarioDto;
-import br.com.springz.dtoform.FuncionarioDtoDetalhado;
 import br.com.springz.dtoform.TelefoneDto;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
@@ -11,13 +9,11 @@ import br.com.springz.repository.TelefoneRepository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.validation.constraints.NotBlank;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,27 +40,30 @@ public class TelefoneService {
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
                         "O Id informado não existe no banco de dados "));
 
-        Telefone telefone = new Telefone(telefoneDto);
-        if(telefone.getFuncionarios() == null) {
-            telefone.setFuncionarios(new ArrayList<>());
+        for (int i=0; i < telefoneDto.getNumeros().size(); i++ ){
+            Telefone telefone = new Telefone(telefoneDto, i);
+            if(telefone.getFuncionarios() == null) {
+                telefone.setFuncionarios(new ArrayList<>());
+            }
+
+            telefone.getFuncionarios().add(funcionario);
+
+            if(funcionario.getTelefones() == null) {
+                funcionario.setTelefones(new ArrayList<>());
+            }
+
+            try{
+                Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumeros().get(i));
+
+                funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
+
+            } catch (Exception ex) {
+                funcionario.getTelefones().add(telefoneRepository.save(telefone));
+
+            }
+            funcionarioRepository.save(funcionario);
         }
 
-        telefone.getFuncionarios().add(funcionario);
-
-        if(funcionario.getTelefones() == null) {
-            funcionario.setTelefones(new ArrayList<>());
-        }
-
-        try{
-            Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumero());
-
-            funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
-
-        } catch (Exception ex) {
-            funcionario.getTelefones().add(telefoneRepository.save(telefone));
-
-        }
-        funcionarioRepository.save(funcionario);
 
         return funcionario;
 

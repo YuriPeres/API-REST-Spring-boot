@@ -2,6 +2,7 @@ package br.com.springz.service;
 
 import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.TelefoneDto;
+import br.com.springz.dtoform.TelefoneDtoAtualizacao;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
 import br.com.springz.repository.FuncionarioRepository;
@@ -11,6 +12,7 @@ import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -35,9 +37,9 @@ public class TelefoneService {
     }
 
     @Transactional
-    public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, TelefoneDto telefoneDto) {
-        Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
-                new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
+    public Funcionario cadastrarTelefoneEmFuncionario(TelefoneDto telefoneDto) {
+        Funcionario funcionario = funcionarioRepository.findById(telefoneDto.getIdFuncionario()).orElseThrow(() ->
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + telefoneDto.getIdFuncionario(),
                         "O Id informado não existe no banco de dados "));
 
         for (int i=0; i < telefoneDto.getNumeros().size(); i++ ){
@@ -55,7 +57,8 @@ public class TelefoneService {
             try{
                 Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumeros().get(i));
 
-                funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
+                funcionarioRepository.ligarTelefoneExistenteEmFuncionario
+                        (telefoneDto.getIdFuncionario(), telefoneExiste.getId());
 
             } catch (Exception ex) {
                 funcionario.getTelefones().add(telefoneRepository.save(telefone));
@@ -69,7 +72,7 @@ public class TelefoneService {
 
     }
 
-    @Transactional
+    @Transactional //NÃO ESTOU USANDO, MAS TEM USO DE GSON PARA LEMBRAR
     public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, String stringTelefones) {
         Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
@@ -105,7 +108,6 @@ public class TelefoneService {
                 funcionario.getTelefones().add(telefoneRepository.save(telefone));
 
             }
-            funcionarioRepository.save(funcionario);
 
         }
 
@@ -118,11 +120,48 @@ public class TelefoneService {
 
 
     @Transactional
-    public Funcionario atualizarTelefone(Long idFuncionario, Long idTelefone){
-        Boolean existeLigacao = telefoneRepository.telefoneExisteEmFuncionario(idFuncionario, idTelefone);
-        System.out.println(existeLigacao);
+    public Funcionario atualizarTelefone(TelefoneDtoAtualizacao dto){
+        if(dto.getNumerosAntigos().size() != dto.getNumerosNovos().size()){
+            throw new RuntimeException("Tamanho da lista nova é incompatível com antiga de telefones.");
+        }
+        Funcionario funcionario = funcionarioRepository.findById(dto.getIdFuncionario()).orElseThrow(() ->
+                new ExceptionIdNaoEcontrado("Id não encontrado: " + dto.getIdFuncionario(),
+                        "O Id informado não existe no banco de dados "));
+        paraCadaNumero: for (int i=0; i < dto.getNumerosAntigos().size(); i++) {
+            try{
+                //verifica se o numero existe
+                Telefone telefoneAntigo = telefoneRepository.findByNumero(dto.getNumerosAntigos().get(i));
+                Long idTelfone = telefoneAntigo.getId();
+//                if(telefone.getId().equals(null)){ acho que não precisa disso
+//                    continue paraCadaNumero;
+//                }
+                //se existe a ligação na tabela funcionario_telefone, ele deleta ela
+                if(telefoneRepository.telefoneExisteEmFuncionario(funcionario.getId(), telefoneAntigo.getId())){
+                    telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneAntigo.getId());
 
-        return null;
+                    //Se o telefone não tiver vinculo com mais ninguem deleta ele da lista de telefones também
+                    if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneAntigo.getId())==0){
+//                        telefoneRepository.deleteById(telefoneAntigo.getId());
+                    }
+
+                }
+                Telefone telefoneNovo = telefoneAntigo;
+                telefoneNovo.setId(idTelfone);
+                telefoneNovo.setNumero(dto.getNumerosNovos().get(i));
+
+//                telefoneRepository.save(telefoneNovo);
+                cadastrarTelefoneEmFuncionario(new TelefoneDto(telefoneNovo));
+
+
+            } catch (Exception ex) {
+                System.out.println("é aqui que cai?");
+                System.out.println(ex.getMessage());
+            }
+
+        }
+//        Boolean existeLigacao = telefoneRepository.telefoneExisteEmFuncionario(idFuncionario, idTelefone);
+
+        return funcionario;
     }
 
 
@@ -130,10 +169,15 @@ public class TelefoneService {
     public ResponseEntity<?> deletarTelefone(Long id) {
         telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
                 "O Id informado não existe no banco de dados "));
+
+        if(telefoneRepository.telefoneNaoTemVinculoAlgum(id)!=0){
+            telefoneRepository.deletarTodosVinculosTelefone(id);
+        }
         telefoneRepository.deleteById(id);
         return ResponseEntity.ok().build();
     }
 
+    @Transactional
     public ResponseEntity<?> deletarTelefoneApenasDoFuncionario(Long idFuncionario, Long idTelefone) {
         telefoneRepository.deletarTelefoneApenasDoFuncionario(idFuncionario, idTelefone);
         return ResponseEntity.ok().build();

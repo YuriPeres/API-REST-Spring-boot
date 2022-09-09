@@ -62,10 +62,8 @@ public class FuncionarioController {
     }
 
     @PutMapping("/telefone/cadastrar")
-    @Transactional
     public FuncionarioDtoDetalhado cadastrarTelefone (@RequestBody @Valid TelefoneDto telefone){
-        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario
-                (telefone.getIdFuncionario(), telefone));
+        return new FuncionarioDtoDetalhado(telefoneService.cadastrarTelefoneEmFuncionario(telefone));
     }
 
 //    @PutMapping("/telefone/{idFuncionario}")
@@ -74,13 +72,12 @@ public class FuncionarioController {
 //    }
 
     @PutMapping("/telefone/atualizar")
-    public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneFormIds ids){
-        System.out.println(telefoneService.atualizarTelefone(ids.getIdFuncionario(), ids.getIdTelefone()));
-        return null;
+    public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneDtoAtualizacao dto){
+   //     System.out.println(telefoneService.atualizarTelefone(dto));
+        return new FuncionarioDtoDetalhado(telefoneService.atualizarTelefone(dto));
     }
 
     @DeleteMapping("/telefone/")
-    @Transactional
     public ResponseEntity<?> deletarTelefoneDoFuncionario(@RequestBody @Valid TelefoneFormIds ids){
         System.out.println(ids);
         return telefoneService.deletarTelefoneApenasDoFuncionario(ids.getIdFuncionario(), ids.getIdTelefone());

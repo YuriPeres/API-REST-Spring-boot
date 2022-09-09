@@ -86,7 +86,7 @@ public class TelefoneServiceTest {
 
 
         TelefoneDto dto = new TelefoneDto(null, List.of(NUMERO_VALIDO));
-        Funcionario resposta = telefoneService.cadastrarTelefoneEmFuncionario(ID_VALIDO, dto);
+        Funcionario resposta = telefoneService.cadastrarTelefoneEmFuncionario(dto);
 
         assertNotNull(resposta);
         assertEquals(Funcionario.class, resposta.getClass());

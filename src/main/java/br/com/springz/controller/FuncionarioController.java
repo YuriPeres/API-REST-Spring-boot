@@ -72,8 +72,7 @@ public class FuncionarioController {
 //    }
 
     @PutMapping("/telefone/atualizar")
-    public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneDtoAtualizacao dto){
-   //     System.out.println(telefoneService.atualizarTelefone(dto));
+    public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneDto dto){
         return new FuncionarioDtoDetalhado(telefoneService.atualizarTelefone(dto));
     }
 

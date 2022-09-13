@@ -16,6 +16,7 @@ public interface TelefoneRepository extends JpaRepository<Telefone, Long> {
     void deletarTelefoneApenasDoFuncionario(@Param("idFuncionario") Long IdFuncionario,
                                             @Param("idTelefone") Long idTelefone);
 
+
     @Modifying
     @Query(value = "DELETE FROM tb_funcionario_telefone WHERE id_telefone=:idTelefone", nativeQuery = true)
     void deletarTodosVinculosTelefone(@Param("idTelefone") Long idTelefone);

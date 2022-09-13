@@ -2,7 +2,6 @@ package br.com.springz.service;
 
 import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.TelefoneDto;
-import br.com.springz.dtoform.TelefoneDtoAtualizacao;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
 import br.com.springz.repository.FuncionarioRepository;
@@ -12,11 +11,11 @@ import com.google.gson.reflect.TypeToken;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,48 +117,88 @@ public class TelefoneService {
     }
 
 
-
+    /*
+    Primeira vez funciona só acrescentar coisa nova
+    Segunda vez deleta tanto os telefones, quanto os funcionários envolvidos
+     */
     @Transactional
-    public Funcionario atualizarTelefone(TelefoneDtoAtualizacao dto){
-        if(dto.getNumerosAntigos().size() != dto.getNumerosNovos().size()){
-            throw new RuntimeException("Tamanho da lista nova é incompatível com antiga de telefones.");
-        }
-        Funcionario funcionario = funcionarioRepository.findById(dto.getIdFuncionario()).orElseThrow(() ->
-                new ExceptionIdNaoEcontrado("Id não encontrado: " + dto.getIdFuncionario(),
-                        "O Id informado não existe no banco de dados "));
-        paraCadaNumero: for (int i=0; i < dto.getNumerosAntigos().size(); i++) {
+    public Funcionario atualizarTelefone(TelefoneDto dto){
+        //1verificar se numero ja existe e
+            //1.1se existe em já funcionario, não fazer nada (FEITO)
+            //1.2se existe, mas não tem vinculo, não cadastrar telefone novo, só vincular (FEITO)
+            //1.3se não existe, salvar telefone e vincular (FEITO)
+        //2verificar se algum número antigo vinculado ao funcionario não está na lista (dando erro)
+            //2.1se tal número não estiver nas duas listas, deletar ele de funcionario
+                //2.1.1se não tiver mais nenhum vínculo nele, deletar ele de telefones
+        Funcionario funcionario = funcionarioRepository.findById(dto.getIdFuncionario()).
+                orElseThrow(() -> new ExceptionIdNaoEcontrado
+                ("Id não encontrado: " + dto.getIdFuncionario(),
+                "O Id informado não existe no banco de dados "));
+
+        paraCadaNumero: for (BigInteger numero:
+             dto.getNumeros()) {
             try{
-                //verifica se o numero existe
-                Telefone telefoneAntigo = telefoneRepository.findByNumero(dto.getNumerosAntigos().get(i));
-                Long idTelfone = telefoneAntigo.getId();
-//                if(telefone.getId().equals(null)){ acho que não precisa disso
-//                    continue paraCadaNumero;
-//                }
-                //se existe a ligação na tabela funcionario_telefone, ele deleta ela
-                if(telefoneRepository.telefoneExisteEmFuncionario(funcionario.getId(), telefoneAntigo.getId())){
-                    telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneAntigo.getId());
-
-                    //Se o telefone não tiver vinculo com mais ninguem deleta ele da lista de telefones também
-                    if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneAntigo.getId())==0){
-//                        telefoneRepository.deleteById(telefoneAntigo.getId());
+                Telefone telefone = telefoneRepository.findByNumero(numero);
+                //O número já possui id em tb_telefone, ou seja, já existe
+                if(!(telefone == null)){
+                    System.out.println("Aqui de novo?");
+                    //Se o telefone já tem ligação com esse funcionário, não faz nada
+                    if(telefoneRepository.telefoneExisteEmFuncionario(funcionario.getId(),telefone.getId())){
+                        continue paraCadaNumero;
+                    } else { //Se ele existe e não tem ligação com funcionário, faz a ligação
+                        funcionarioRepository.ligarTelefoneExistenteEmFuncionario
+                                (funcionario.getId(), telefone.getId());
+                        continue paraCadaNumero;
                     }
+                } else {
+                    //cadastrar telefone que não existe
+                    telefone = new Telefone();
+                    telefone.setNumero(numero);
+                    if(telefone.getFuncionarios() == null) {
+                        telefone.setFuncionarios(new ArrayList<>());
+                    }
+                    telefone.getFuncionarios().add(funcionario);
 
+                    funcionario.getTelefones().add(telefoneRepository.save(telefone));
+                    System.out.println("chegou no fim");
                 }
-                Telefone telefoneNovo = telefoneAntigo;
-                telefoneNovo.setId(idTelfone);
-                telefoneNovo.setNumero(dto.getNumerosNovos().get(i));
 
-//                telefoneRepository.save(telefoneNovo);
-                cadastrarTelefoneEmFuncionario(new TelefoneDto(telefoneNovo));
-
-
-            } catch (Exception ex) {
-                System.out.println("é aqui que cai?");
+            }catch (Exception ex){
                 System.out.println(ex.getMessage());
+                System.out.println(ex.getLocalizedMessage());
             }
 
         }
-//        Boolean existeLigacao = telefoneRepository.telefoneExisteEmFuncionario(idFuncionario, idTelefone);
+
+        for (int i = 0; i < funcionario.getTelefones().size(); i++){
+        }
+
+        //verificar quais números não estão mais na lista
+        for(int i = 0; i<funcionario.getTelefones().size(); i++){
+            //se a lista de números do dto não contém o telefone que tinha no funcionário, deletar esse telefone
+            //do funcionário
+            if(!(dto.getNumeros().contains(funcionario.getTelefones().get(i)))){
+                System.out.println("Entra no if do deletar?");
+                try{
+                    Long idTelParaDeletar = telefoneRepository.findByNumero
+                            (funcionario.getTelefones().get(i).getNumero()).getId();
+
+                    System.out.println(idTelParaDeletar+" -> "+funcionario.getTelefones().get(i).getNumero());
+
+                    telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), idTelParaDeletar);
+                    //se esse telefone não tem mais vínculo algum, deletar ele de tb_telefone
+                    if(telefoneRepository.telefoneNaoTemVinculoAlgum(idTelParaDeletar)==0){
+                        telefoneRepository.deleteById(idTelParaDeletar);
+                    }
+                }catch (Exception ex){
+                    System.out.println("Deu erro no deletar!\n"+ex.getMessage()+"\n"+ex.getCause());
+                }
+            }
+        }
+
+
+
+
 
         return funcionario;
     }
@@ -167,7 +206,8 @@ public class TelefoneService {
 
     @Transactional
     public ResponseEntity<?> deletarTelefone(Long id) {
-        telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+        telefoneRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado
+                ("Id não encontrado: " + id,
                 "O Id informado não existe no banco de dados "));
 
         if(telefoneRepository.telefoneNaoTemVinculoAlgum(id)!=0){

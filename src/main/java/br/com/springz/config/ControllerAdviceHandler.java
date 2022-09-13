@@ -33,7 +33,7 @@ public class ControllerAdviceHandler {
     public ResponseEntity<NaoEcontradoDto> naoEcontrando(ExceptionIdNaoEcontrado ex, HttpServletRequest request) {
         NaoEcontradoDto naoEcontradoDto = new NaoEcontradoDto();
         naoEcontradoDto.setExcecao(ex.getMessage());
-        naoEcontradoDto.setDecricao(ex.getDescricaoMsgDeErro());
+        naoEcontradoDto.setDescricao(ex.getDescricaoMsgDeErro());
         naoEcontradoDto.setStatus(HttpStatus.NOT_FOUND.value());
         naoEcontradoDto.setInstante(Instant.now());
         naoEcontradoDto.setOndeOcorreu(request.getRequestURI());

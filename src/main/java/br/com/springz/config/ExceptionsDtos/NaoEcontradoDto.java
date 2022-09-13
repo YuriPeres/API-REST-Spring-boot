@@ -14,7 +14,7 @@ public class NaoEcontradoDto implements Serializable {
     private Instant instante;
     private Integer status;
     private String excecao;
-    private String decricao;
+    private String descricao;
     private String ondeOcorreu;
 
 

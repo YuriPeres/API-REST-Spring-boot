@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -135,6 +136,7 @@ public class TelefoneService {
                 ("Id não encontrado: " + dto.getIdFuncionario(),
                 "O Id informado não existe no banco de dados "));
 
+        List<Telefone> listaTelAntigos = funcionario.getTelefones();
         paraCadaNumero: for (BigInteger numero:
              dto.getNumeros()) {
             try{
@@ -170,35 +172,29 @@ public class TelefoneService {
 
         }
 
-        for (int i = 0; i < funcionario.getTelefones().size(); i++){
-        }
 
-        //verificar quais números não estão mais na lista
-        for(int i = 0; i<funcionario.getTelefones().size(); i++){
-            //se a lista de números do dto não contém o telefone que tinha no funcionário, deletar esse telefone
-            //do funcionário
-            if(!(dto.getNumeros().contains(funcionario.getTelefones().get(i)))){
-                System.out.println("Entra no if do deletar?");
-                try{
-                    Long idTelParaDeletar = telefoneRepository.findByNumero
-                            (funcionario.getTelefones().get(i).getNumero()).getId();
+        //verificar quais números não estão mais na lista e deleta eles
+        List<Telefone> telParaDeletar = listaTelAntigos.stream()
+                .filter(telefoneNovo -> (!(dto.getNumeros().contains(telefoneNovo.getNumero()))))
+                .collect(Collectors.toList());
+        System.out.println(telParaDeletar);
 
-                    System.out.println(idTelParaDeletar+" -> "+funcionario.getTelefones().get(i).getNumero());
-
-                    telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), idTelParaDeletar);
-                    //se esse telefone não tem mais vínculo algum, deletar ele de tb_telefone
-                    if(telefoneRepository.telefoneNaoTemVinculoAlgum(idTelParaDeletar)==0){
-                        telefoneRepository.deleteById(idTelParaDeletar);
-                    }
-                }catch (Exception ex){
-                    System.out.println("Deu erro no deletar!\n"+ex.getMessage()+"\n"+ex.getCause());
-                }
+        for (Telefone telefoneDel:
+             telParaDeletar) {
+            System.out.println("Não sai? -> "+telefoneDel);
+            telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
+//            deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
+            if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
+//                deletarTelefone(telefoneDel.getId());
+                telefoneRepository.deleteById(telefoneDel.getId());
             }
+//            //deleta vínculo com funcionário
+//            telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
+//            //se não tem vínculo com mais ninguém deleta telefone de tb_telefone
+//            if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
+//                telefoneRepository.deleteById(telefoneDel.getId());
+//            }
         }
-
-
-
-
 
         return funcionario;
     }

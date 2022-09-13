@@ -21,10 +21,7 @@ public class Telefone {
     private BigInteger numero;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "tb_funcionario_telefone",
-        joinColumns = @JoinColumn(name = "id_telefone", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "id_funcionario", referencedColumnName = "id"))
+    @ManyToMany(mappedBy = "telefones")
     private List<Funcionario> funcionarios;
 
     public Telefone(TelefoneDto dto, int i) {

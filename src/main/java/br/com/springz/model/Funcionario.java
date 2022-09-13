@@ -41,7 +41,12 @@ public class Funcionario {
     @JoinColumn(name = "id_endereco", referencedColumnName = "id")
     private Endereco endereco;
 
-    @ManyToMany(mappedBy = "funcionarios")
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "tb_funcionario_telefone",
+            joinColumns        = @JoinColumn(name = "id_funcionario", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_telefone", referencedColumnName = "id")
+    )
     private List<Telefone> telefones;
 
     public Funcionario(String nome, String sobrenome, String email, Integer idade, Boolean ativo, Endereco endereco) {

@@ -13,6 +13,13 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> 
     @Modifying
     @Query(value = "INSERT INTO tb_funcionario_telefone (id_funcionario, id_telefone) " +
             "VALUES (:idFuncionario, :idTelefone);", nativeQuery=true)
-    void ligarTelefoneExistenteEmFuncionario(@Param("idFuncionario") Long idFuncionario, @Param("idTelefone") Long idTelefone);
+    void ligarTelefoneExistenteEmFuncionario(@Param("idFuncionario") Long idFuncionario,
+                                             @Param("idTelefone") Long idTelefone);
+
+    @Query(value = "SELECT * FROM tb_funcionario tf " +
+            "JOIN tb_funcionario_telefone tft on tf.id = tft.id_funcionario " +
+            "JOIN tb_telefone tt on tt.id = tft.id_telefone " +
+            "WHERE tf.id=:idFuncionario", nativeQuery = true)
+    Funcionario acharFuncionarioPorIdNativo(@Param("idFuncionario") Long id);
 
 }

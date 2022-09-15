@@ -160,44 +160,36 @@ public class TelefoneService {
                         telefone.setFuncionarios(new ArrayList<>());
                     }
                     telefone.getFuncionarios().add(funcionario);
-
                     funcionario.getTelefones().add(telefoneRepository.save(telefone));
-                    System.out.println("chegou no fim");
                 }
-
             }catch (Exception ex){
                 System.out.println(ex.getMessage());
                 System.out.println(ex.getLocalizedMessage());
             }
-
         }
-
 
         //verificar quais números não estão mais na lista e deleta eles
         List<Telefone> telParaDeletar = listaTelAntigos.stream()
                 .filter(telefoneNovo -> (!(dto.getNumeros().contains(telefoneNovo.getNumero()))))
                 .collect(Collectors.toList());
-        System.out.println(telParaDeletar);
 
         for (Telefone telefoneDel:
              telParaDeletar) {
-            System.out.println("Não sai? -> "+telefoneDel);
             telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
-//            deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
             if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
-//                deletarTelefone(telefoneDel.getId());
-                telefoneRepository.deleteById(telefoneDel.getId());
+                funcionario.getTelefones().remove(telefoneDel.getNumero());
+                telefoneRepository.deleteTelefoneNativoById(telefoneDel.getId());
             }
-//            //deleta vínculo com funcionário
-//            telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
-//            //se não tem vínculo com mais ninguém deleta telefone de tb_telefone
-//            if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
-//                telefoneRepository.deleteById(telefoneDel.getId());
-//            }
-        }
 
-        return funcionario;
+        }
+        return funcionarioRepository.acharFuncionarioPorIdNativo(funcionario.getId());
     }
+
+    public Funcionario retornaFuncionario(Long idFuncionario){
+        return funcionarioRepository.acharFuncionarioPorIdNativo(idFuncionario);
+    }
+
+
 
 
     @Transactional

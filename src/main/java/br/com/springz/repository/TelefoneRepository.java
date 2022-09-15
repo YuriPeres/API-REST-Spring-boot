@@ -21,13 +21,6 @@ public interface TelefoneRepository extends JpaRepository<Telefone, Long> {
     @Query(value = "DELETE FROM tb_funcionario_telefone WHERE id_telefone=:idTelefone", nativeQuery = true)
     void deletarTodosVinculosTelefone(@Param("idTelefone") Long idTelefone);
 
-//    select exists (select tf.id as "idFuncionario", tf.nome as "nome",
-//                   tt.id as "idNumero", tt as "numero"
-//                           from tb_funcionario tf
-//                           join tb_funcionario_telefone tft on tf.id = tft.id_funcionario
-//                           join tb_telefone tt on tt.id =tft.id_telefone
-//                           where tft.id_funcionario =18 and tft.id_telefone
-//                           = 35)::bool
 
     @Query(value = "SELECT EXISTS (SELECT * FROM tb_funcionario_telefone " +
             "WHERE id_funcionario =:idFuncionario AND id_telefone=:idTelefone)", nativeQuery = true)
@@ -40,4 +33,10 @@ public interface TelefoneRepository extends JpaRepository<Telefone, Long> {
     @Query(value = "SELECT  COUNT (tft.id_funcionario) FROM tb_funcionario_telefone tft WHERE tft.id_telefone =:idTelefone",
             nativeQuery = true)
     int telefoneNaoTemVinculoAlgum(@Param("idTelefone") Long idTelefone);
+
+    @Modifying
+    @Query(value = "DELETE FROM tb_telefone tt WHERE tt.id =:idTelefone", nativeQuery = true)
+    void deleteTelefoneNativoById(@Param("idTelefone") Long idTelefone);
+
+
 }

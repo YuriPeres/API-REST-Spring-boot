@@ -73,8 +73,7 @@ public class FuncionarioController {
 
     @PutMapping("/telefone/atualizar")
     public FuncionarioDtoDetalhado atualizarTelefoneDoUsuario (@RequestBody @Valid TelefoneDto dto){
-        telefoneService.atualizarTelefone(dto);
-        return new FuncionarioDtoDetalhado(telefoneService.retornaFuncionario(dto.getIdFuncionario()));
+        return new FuncionarioDtoDetalhado(telefoneService.atualizarTelefone(dto));
     }
 
     @DeleteMapping("/telefone/")

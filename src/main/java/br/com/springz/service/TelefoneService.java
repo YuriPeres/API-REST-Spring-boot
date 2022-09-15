@@ -143,7 +143,6 @@ public class TelefoneService {
                 Telefone telefone = telefoneRepository.findByNumero(numero);
                 //O número já possui id em tb_telefone, ou seja, já existe
                 if(!(telefone == null)){
-                    System.out.println("Aqui de novo?");
                     //Se o telefone já tem ligação com esse funcionário, não faz nada
                     if(telefoneRepository.telefoneExisteEmFuncionario(funcionario.getId(),telefone.getId())){
                         continue paraCadaNumero;
@@ -177,17 +176,14 @@ public class TelefoneService {
              telParaDeletar) {
             telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
             if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
-                funcionario.getTelefones().remove(telefoneDel.getNumero());
-                telefoneRepository.deleteTelefoneNativoById(telefoneDel.getId());
+                funcionario.getTelefones().remove(telefoneDel);
+                //telefoneRepository.deleteTelefoneNativoById(telefoneDel.getId());
             }
 
         }
-        return funcionarioRepository.acharFuncionarioPorIdNativo(funcionario.getId());
+        return funcionarioRepository.findById(funcionario.getId()).get();
     }
 
-    public Funcionario retornaFuncionario(Long idFuncionario){
-        return funcionarioRepository.acharFuncionarioPorIdNativo(idFuncionario);
-    }
 
 
 

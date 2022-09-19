@@ -41,19 +41,15 @@ public class TelefoneService {
         Funcionario funcionario = funcionarioRepository.findById(telefoneDto.getIdFuncionario()).orElseThrow(() ->
                 new ExceptionIdNaoEcontrado("Id não encontrado: " + telefoneDto.getIdFuncionario(),
                         "O Id informado não existe no banco de dados "));
-
         for (int i=0; i < telefoneDto.getNumeros().size(); i++ ){
             Telefone telefone = new Telefone(telefoneDto, i);
             if(telefone.getFuncionarios() == null) {
                 telefone.setFuncionarios(new ArrayList<>());
             }
-
             telefone.getFuncionarios().add(funcionario);
-
             if(funcionario.getTelefones() == null) {
                 funcionario.setTelefones(new ArrayList<>());
             }
-
             try{
                 Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDto.getNumeros().get(i));
 
@@ -66,56 +62,36 @@ public class TelefoneService {
             }
             funcionarioRepository.save(funcionario);
         }
-
-
         return funcionario;
-
     }
 
-    @Transactional //NÃO ESTOU USANDO, MAS TEM USO DE GSON PARA LEMBRAR
-    public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, String stringTelefones) {
-        Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
-                new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
-                        "O Id informado não existe no banco de dados "));
-
-
-        Gson gson = new Gson();
-
-        Type tipoLista = new TypeToken<ArrayList<Telefone>>() {}.getType();
-
-        ArrayList<Telefone> listaTelefones  = gson.fromJson(stringTelefones, tipoLista);
-
-        for (Telefone telefoneDaLista:
-             listaTelefones) {
-
-            Telefone telefone = telefoneDaLista;
-            if(telefone.getFuncionarios() == null) {
-                telefone.setFuncionarios(new ArrayList<>());
-            }
-
-            telefone.getFuncionarios().add(funcionario);
-
-            if(funcionario.getTelefones() == null) {
-                funcionario.setTelefones(new ArrayList<>());
-            }
-
-            try{
-                Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDaLista.getNumero());
-
-                funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
-
-            } catch (Exception ex) {
-                funcionario.getTelefones().add(telefoneRepository.save(telefone));
-
-            }
-
-        }
-
-
-
-        return funcionario;
-
-    }
+//    @Transactional //NÃO ESTOU USANDO, MAS TEM USO DE GSON PARA LEMBRAR
+//    public Funcionario cadastrarTelefoneEmFuncionario(Long idFuncionario, String stringTelefones) {
+//        Funcionario funcionario = funcionarioRepository.findById(idFuncionario).orElseThrow(() ->
+//                new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
+//                        "O Id informado não existe no banco de dados "));
+//        Gson gson = new Gson();
+//        Type tipoLista = new TypeToken<ArrayList<Telefone>>() {}.getType();
+//        ArrayList<Telefone> listaTelefones  = gson.fromJson(stringTelefones, tipoLista);
+//        for (Telefone telefoneDaLista:
+//             listaTelefones) {
+//            Telefone telefone = telefoneDaLista;
+//            if(telefone.getFuncionarios() == null) {
+//                telefone.setFuncionarios(new ArrayList<>());
+//            }
+//            telefone.getFuncionarios().add(funcionario);
+//            if(funcionario.getTelefones() == null) {
+//                funcionario.setTelefones(new ArrayList<>());
+//            }
+//            try{
+//                Telefone telefoneExiste = telefoneRepository.findByNumero(telefoneDaLista.getNumero());
+//                funcionarioRepository.ligarTelefoneExistenteEmFuncionario(idFuncionario, telefoneExiste.getId());
+//            } catch (Exception ex) {
+//                funcionario.getTelefones().add(telefoneRepository.save(telefone));
+//            }
+//        }
+//        return funcionario;
+//    }
 
 
     /*
@@ -203,6 +179,13 @@ public class TelefoneService {
 
     @Transactional
     public ResponseEntity<?> deletarTelefoneApenasDoFuncionario(Long idFuncionario, Long idTelefone) {
+        funcionarioRepository.findById(idFuncionario).orElseThrow(
+                () -> new ExceptionIdNaoEcontrado("Id não encontrado: " + idFuncionario,
+                "O Id informado não existe no banco de dados "));
+        telefoneRepository.findById(idTelefone).orElseThrow(
+                () -> new ExceptionIdNaoEcontrado("Id não encontrado: " + idTelefone,
+                "O Id informado não existe no banco de dados "));
+
         telefoneRepository.deletarTelefoneApenasDoFuncionario(idFuncionario, idTelefone);
         return ResponseEntity.ok().build();
     }

@@ -34,6 +34,12 @@ public class Telefone {
         this.numero = numero.get(i);
     }
 
+    public Telefone(Long id, BigInteger numero) {
+        this.id = id;
+        this.numero = numero;
+    }
+
+
     @Override
     public String toString() {
         return "Telefone{" +

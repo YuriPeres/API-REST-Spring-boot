@@ -1,5 +1,6 @@
 package br.com.springz.service;
 
+import br.com.springz.config.exceptions.ExceptionIdNaoEcontrado;
 import br.com.springz.dtoform.*;
 import br.com.springz.model.Funcionario;
 import br.com.springz.model.Telefone;
@@ -18,6 +19,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +27,9 @@ import static br.com.springz.utils.FuncionarioStub.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 //@ExtendWith(MockitoExtension.class)
@@ -35,6 +39,7 @@ public class TelefoneServiceTest {
 
 
     public static final BigInteger NUMERO_VALIDO = BigInteger.valueOf(988776644);
+    public static final BigInteger NUMERO_VALIDO_DOIS = BigInteger.valueOf(123456789);
     private static final List<Funcionario> LISTA_FUNCIONARIO = List.of(FUNCIONARIO_VALIDO);
     @InjectMocks
     private FuncionarioService funcionarioService;
@@ -65,7 +70,10 @@ public class TelefoneServiceTest {
     @Test
     @DisplayName("Verifica se o telefoneService.listarTodosTelefones() retorna uma Set<TelefoneDto> corretamente")
     public void listarTodosTelefonesValido() {
-        given(telefoneRepository.findAll()).willReturn(List.of(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0)));
+        List<BigInteger> listaNumeros = new ArrayList();
+        listaNumeros.add(NUMERO_VALIDO);
+        given(telefoneRepository.findAll()).willReturn(List.of
+                (new Telefone(ID_VALIDO, listaNumeros, 0)));
 
         List<TelefoneDto> resposta = telefoneService.listarTodosTelefones();
 
@@ -74,15 +82,22 @@ public class TelefoneServiceTest {
         assertEquals(1, resposta.size());
         assertEquals(TelefoneDto.class, resposta.get(INDEX).getClass());
         assertEquals(ID_VALIDO, resposta.get(INDEX).getId());
-        assertEquals(NUMERO_VALIDO, resposta.get(INDEX).getNumeros());
+        assertEquals(NUMERO_VALIDO, resposta.get(INDEX).getNumero());
 }
+
 
     @Test
     @DisplayName("Quando cadastrar retorna sucesso.")
     public void cadastrarTelefoneEmFuncionarioValido() {
-        given(telefoneRepository.save(any())).willReturn(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0));
+        Funcionario funcionarioTeste = FUNCIONARIO_VALIDO;
+        Telefone telefoneTeste = new Telefone();
+        telefoneTeste.setNumero(NUMERO_VALIDO);
+        telefoneTeste.setId(1L);
+        funcionarioTeste.setTelefones(new ArrayList<>(List.of(telefoneTeste)));
+
         given(funcionarioRepository.findById(any())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
-        given(funcionarioRepository.save(any())).willReturn(FUNCIONARIO_VALIDO);
+        given(telefoneRepository.save(any())).willReturn(telefoneTeste);
+        given(funcionarioRepository.save(any())).willReturn(funcionarioTeste);
 
 
         TelefoneDto dto = new TelefoneDto(null, List.of(NUMERO_VALIDO));
@@ -92,10 +107,109 @@ public class TelefoneServiceTest {
         assertEquals(Funcionario.class, resposta.getClass());
         assertEquals(ID_VALIDO, resposta.getTelefones().get(0).getId());
         assertEquals(NUMERO_VALIDO, resposta.getTelefones().get(0).getNumero());
-        Funcionario fun = FUNCIONARIO_VALIDO;
-        fun.getTelefones().add(new Telefone(ID_VALIDO, (List<BigInteger>) NUMERO_VALIDO, 0));
-        assertEquals(fun, resposta);
+        assertEquals(funcionarioTeste, resposta);
     }
+
+
+
+    @Test
+    @DisplayName("Verifica se o telefoneService.cadastrar() lida corretamente com exception de funcionario")
+    public void cadastrarTelefoneException() {
+        given(funcionarioRepository.findById(anyLong()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        funcionarioService.atualizar(anyLong(), new FuncionarioFormAtualizacao());
+
+    }
+
+    @Test
+    @DisplayName("Verifica se o telefoneService.deletarTelefoneApenasDoFuncionario() realmente chama o delete")
+    public void deletarTelefoneApenasDoFuncionario(){
+        given(funcionarioRepository.findById(anyLong())).willReturn(Optional.of(FUNCIONARIO_VALIDO));
+        given(telefoneRepository.findById(anyLong())).willReturn(Optional.of(new Telefone()));
+        doNothing().when(telefoneRepository).deletarTelefoneApenasDoFuncionario(anyLong(),anyLong());
+        telefoneService.deletarTelefoneApenasDoFuncionario(0L,0L);
+        verify(telefoneRepository, times(1)).
+                deletarTelefoneApenasDoFuncionario(anyLong(),anyLong());
+    }
+
+    @Test
+    @DisplayName("Delete quando não acha resposta")
+    public void deletarTelefoneApenasDoFuncionarioComException() {
+        for(int i=0; i<2; i++){
+            if(i==0){
+                given(funcionarioRepository.findById(anyLong()))
+                        .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+            } else{
+                given(telefoneRepository.findById(anyLong()))
+                        .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+            }
+            expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+            telefoneService.deletarTelefoneApenasDoFuncionario(1L, 1L);
+        }
+    }
+
+//    @Test
+//    @DisplayName("Delete dando sucesso deve rodar uma vez.")
+//    public void deletarTelefoneComSucesso() {
+//        given(telefoneRepository.findById(anyLong())).willReturn(Optional.of(new Telefone()));
+//        doNothing().when(telefoneRepository).deleteById(anyLong());
+//        telefoneService.deletarTelefone(ID_VALIDO);
+//        verify(telefoneRepository, times(1)).deleteById(anyLong());
+//    }
+
+    @Test
+    @DisplayName("Delete dando sucesso deve rodar uma vez.")
+    public void deletarTelefoneComVinculoComSucesso() {
+        given(telefoneRepository.findById(anyLong())).willReturn(Optional.of(new Telefone()));
+        given(telefoneRepository.telefoneNaoTemVinculoAlgum(anyLong()))
+                .willReturn(1);
+        doNothing().when(telefoneRepository).deleteById(anyLong());
+        doNothing().when(telefoneRepository).deletarTodosVinculosTelefone(anyLong());
+        telefoneService.deletarTelefone(ID_VALIDO);
+        verify(telefoneRepository, times(1)).deleteById(anyLong());
+        verify(telefoneRepository, times(1)).deletarTodosVinculosTelefone(1l);
+    }
+
+    @Test
+    @DisplayName("Delete quando não acha resposta")
+    public void deletarTelefoneComException() {
+        given(telefoneRepository.findById(anyLong()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        telefoneService.deletarTelefone(anyLong());
+
+    }
+
+
+    //não roda o ligarTelefoneExistenteEmFuncionario
+    @Test
+    @DisplayName("Telefone Novo existe (não em funcionário) e substituirá velho")
+    public void atualizarTelefoneExistenteComSucesso(){
+        Funcionario funcionario = FUNCIONARIO_VALIDO;
+        funcionario.setTelefones(new ArrayList<>());
+        given(funcionarioRepository.findById(any())).willReturn(Optional.of(funcionario));
+
+        Telefone telefone = new Telefone();
+        telefone.setNumero(NUMERO_VALIDO);
+        telefone.setId(1L);
+        given(telefoneRepository.findByNumero(any())).willReturn(telefone);
+
+        given(telefoneRepository.telefoneExisteEmFuncionario(any(),any())).willReturn(false);
+        doNothing().when(funcionarioRepository).ligarTelefoneExistenteEmFuncionario(anyLong(), anyLong());
+
+        TelefoneDto dto = new TelefoneDto();
+        dto.setNumeros(new ArrayList<>());
+        dto.getNumeros().add(NUMERO_VALIDO);
+        telefoneService.atualizarTelefone(dto);
+        verify(funcionarioRepository, times(1))
+                .ligarTelefoneExistenteEmFuncionario(ID_VALIDO,1l);
+
+    }
+
+
 //
 //    @Test
 //    @DisplayName("Quando atualizar retorna o form esperado")

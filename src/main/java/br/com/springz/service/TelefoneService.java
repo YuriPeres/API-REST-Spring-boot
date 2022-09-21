@@ -134,7 +134,7 @@ public class TelefoneService {
                     if(telefone.getFuncionarios() == null) {
                         telefone.setFuncionarios(new ArrayList<>());
                     }
-                    telefone.getFuncionarios().add(funcionario);
+                    telefone.getFuncionarios().add(funcionario); //--> Como verifica isso
                     funcionario.getTelefones().add(telefoneRepository.save(telefone));
                 }
             }catch (Exception ex){
@@ -152,7 +152,7 @@ public class TelefoneService {
              telParaDeletar) {
             telefoneRepository.deletarTelefoneApenasDoFuncionario(funcionario.getId(), telefoneDel.getId());
             if(telefoneRepository.telefoneNaoTemVinculoAlgum(telefoneDel.getId())==0){
-                funcionario.getTelefones().remove(telefoneDel);
+                funcionario.getTelefones().remove(telefoneDel); //--> Como verifica isso
                 //telefoneRepository.deleteTelefoneNativoById(telefoneDel.getId());
             }
 

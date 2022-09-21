@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,7 @@ public class TelefoneServiceTest {
     public static final BigInteger NUMERO_VALIDO = BigInteger.valueOf(988776644);
     public static final BigInteger NUMERO_VALIDO_DOIS = BigInteger.valueOf(123456789);
     private static final List<Funcionario> LISTA_FUNCIONARIO = List.of(FUNCIONARIO_VALIDO);
+    public static final BigInteger NUMERO_VALIDO_TRES = BigInteger.valueOf(888888888);
     @InjectMocks
     private FuncionarioService funcionarioService;
 
@@ -184,29 +186,118 @@ public class TelefoneServiceTest {
     }
 
 
-    //não roda o ligarTelefoneExistenteEmFuncionario
     @Test
-    @DisplayName("Telefone Novo existe (não em funcionário) e substituirá velho")
-    public void atualizarTelefoneExistenteComSucesso(){
+    @DisplayName("Verifica:" +
+            "Novo Telefone, mas não vinculado a funcionario" +
+            "Telefone já existente em funcionario" +
+            "telefone que sera deletado de funcionario")
+    public void atualizarTelefoneComSucesso(){
+        Funcionario funcionario = FUNCIONARIO_VALIDO;
+        funcionario.setTelefones(new ArrayList<>());
+        //telefoneDois verifica se numero já salvo em funcionário funciona
+        Telefone telefoneDois = new Telefone();
+        telefoneDois.setId(2l);
+        telefoneDois.setNumero(NUMERO_VALIDO_DOIS);
+        funcionario.getTelefones().add(telefoneDois);
+        //telefoneTres verifica se deleta telefone que não vem no atualizar
+        Telefone telefoneTres = new Telefone();
+        telefoneTres.setId(3l);
+        telefoneTres.setNumero(NUMERO_VALIDO_TRES);
+        funcionario.getTelefones().add(telefoneTres);
+        given(funcionarioRepository.findById(any())).willReturn(Optional.of(funcionario));
+
+
+        //telefoneUm verifica se número salvo no banco, mas não em funcionário funciona
+        Telefone telefoneUm = new Telefone();
+        telefoneUm.setNumero(NUMERO_VALIDO);
+        telefoneUm.setId(1L);
+        given(telefoneRepository.findByNumero(NUMERO_VALIDO)).willReturn(telefoneUm);
+
+        given(telefoneRepository.telefoneExisteEmFuncionario(ID_VALIDO,1L)).willReturn(false);
+        doNothing().when(funcionarioRepository).ligarTelefoneExistenteEmFuncionario(anyLong(), anyLong());
+
+        given(telefoneRepository.findByNumero(NUMERO_VALIDO_DOIS)).willReturn(telefoneDois);
+        given(telefoneRepository.telefoneExisteEmFuncionario(ID_VALIDO,2L)).willReturn(true);
+
+        TelefoneDto dto = new TelefoneDto();
+        dto.setNumeros(new ArrayList<>());
+        dto.getNumeros().add(NUMERO_VALIDO);
+        dto.getNumeros().add(NUMERO_VALIDO_DOIS);
+        telefoneService.atualizarTelefone(dto);
+
+//        given(telefoneRepository.findByNumero(NUMERO_VALIDO_TRES)).willReturn(telefoneTres);
+        doNothing().when(telefoneRepository).deletarTelefoneApenasDoFuncionario(ID_VALIDO,3l);
+        given(telefoneRepository.telefoneNaoTemVinculoAlgum(any())).willReturn(1);
+
+        verify(funcionarioRepository, times(1))
+                .ligarTelefoneExistenteEmFuncionario(ID_VALIDO,1l);
+
+        verify(telefoneRepository, times(1))
+                .telefoneExisteEmFuncionario(ID_VALIDO,2l);
+
+        verify(telefoneRepository, times(1))
+                .deletarTelefoneApenasDoFuncionario(ID_VALIDO,3l);
+    }
+
+    @Test
+    @DisplayName("Verifica: telefone completamente novo (nao contém em tb_telefone)")
+    public void atualizarTelefoneCompletamenteNovoComSucesso(){
         Funcionario funcionario = FUNCIONARIO_VALIDO;
         funcionario.setTelefones(new ArrayList<>());
         given(funcionarioRepository.findById(any())).willReturn(Optional.of(funcionario));
 
         Telefone telefone = new Telefone();
         telefone.setNumero(NUMERO_VALIDO);
-        telefone.setId(1L);
-        given(telefoneRepository.findByNumero(any())).willReturn(telefone);
+        given(telefoneRepository.findByNumero(NUMERO_VALIDO)).willReturn(null);
 
-        given(telefoneRepository.telefoneExisteEmFuncionario(any(),any())).willReturn(false);
-        doNothing().when(funcionarioRepository).ligarTelefoneExistenteEmFuncionario(anyLong(), anyLong());
+        given(telefoneRepository.save(any())).willReturn(telefone);
 
         TelefoneDto dto = new TelefoneDto();
-        dto.setNumeros(new ArrayList<>());
-        dto.getNumeros().add(NUMERO_VALIDO);
-        telefoneService.atualizarTelefone(dto);
-        verify(funcionarioRepository, times(1))
-                .ligarTelefoneExistenteEmFuncionario(ID_VALIDO,1l);
+        dto.setNumeros(new ArrayList<>(Arrays.asList(NUMERO_VALIDO)));
 
+        Funcionario funResposta = new Funcionario();
+        funResposta.setTelefones(new ArrayList<>(Arrays.asList(telefone)));
+        given(telefoneRepository.save(any())).willReturn(telefone);
+        //given(funcionario.getTelefones().add(telefoneRepository.save(telefone))).willReturn(true);
+
+        telefoneService.atualizarTelefone(dto);
+        //verify(funcionario.getTelefones()).add(telefoneRepository.save(telefone));
+
+        verify(telefoneRepository, times(1)).save(any());
+       // verify(funcionarioRepository, times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("")
+    public void atualizarComExceptionEmAcharFuncionario(){
+        given(funcionarioRepository.findById(anyLong()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        TelefoneDto dto = new TelefoneDto();
+        dto.setIdFuncionario(1l);
+        telefoneService.atualizarTelefone(dto);
+    }
+
+    @Test
+    @DisplayName("") //Esse não resolvi
+    public void atualizarComExceptionEmAcharPeloNumero(){
+        Funcionario funcionario = FUNCIONARIO_VALIDO;
+        funcionario.setTelefones(new ArrayList<>());
+        Telefone telefone = new Telefone();
+        telefone.setNumero(NUMERO_VALIDO);
+        telefone.setId(1l);
+        funcionario.getTelefones().add(telefone);
+
+        given(funcionarioRepository.findById(anyLong())).willReturn(Optional.of(funcionario));
+        given(telefoneRepository.findByNumero(any()))
+                .willThrow(new ExceptionIdNaoEcontrado(OBJETO_NAO_ENCONTRADO));
+
+        expectedException.expectMessage(OBJETO_NAO_ENCONTRADO);
+        TelefoneDto dto = new TelefoneDto();
+        dto.setIdFuncionario(1l);
+        dto.setNumeros(Arrays.asList(NUMERO_VALIDO));
+        telefoneService.atualizarTelefone(dto);
     }
 
 

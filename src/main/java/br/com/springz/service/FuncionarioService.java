@@ -80,7 +80,8 @@ public class FuncionarioService {
 
 
     public ResponseEntity<?> delete(Long id) {
-        funcionarioRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado("Id não encontrado: " + id,
+        funcionarioRepository.findById(id).orElseThrow(() -> new ExceptionIdNaoEcontrado
+                ("Id não encontrado: " + id,
                 "O Id informado não existe no banco de dados "));
         funcionarioRepository.deleteById(id);
         return ResponseEntity.ok().build();
